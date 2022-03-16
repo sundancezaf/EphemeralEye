@@ -43,10 +43,14 @@ class no_extension_cleanup():
             line = file.readline()
             while line:
                 linecount +=1
-                first = re.search("^(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}$",line)
-                if (first):
-                        occurrences.write(f"Line Number {linecount} \n")
-                        break                
+                lineList = line.split(" ")
+                for section in lineList:
+                    section = str(section)
+                    first = re.search("^(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}$",section)
+                    if (first):
+                            occurrences.write(f"File name: {self.filetoRead} \n")
+                            occurrences.write(f"Line Number {linecount} \n")
+                            break                
                 line = file.readline()
             
 

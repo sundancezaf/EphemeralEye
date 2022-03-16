@@ -17,3 +17,6 @@
     According to file type, open and check for PII
     Write if the file contains PII
 3. Return after every folder has been checked
+
+
+^(\d{3}[0-9]+(-[0-9]+)-[0-9]+)
