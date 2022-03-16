@@ -1,5 +1,6 @@
 # Import dependencies here
 import os
+import re
 #import pandas
 
 class main:
@@ -41,15 +42,11 @@ class no_extension_cleanup():
             linecount = 0
             line = file.readline()
             while line:
-                if (("SSN" in line) or ("ssn" in line) or ("social security number" in line)):
-                    count +=1
-                    linecount +=1
-                    occurrences.write(str(count));
-                    occurrences.write(f"Line Number %)
-                    # Write to the text file which file contains the ssn
-                    # Break from here because no need to search for other SSNs, one is enough
-
-                    break
+                linecount +=1
+                first = re.search("^(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}$",line)
+                if (first):
+                        occurrences.write(f"Line Number {linecount} \n")
+                        break                
                 line = file.readline()
             
 
