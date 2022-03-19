@@ -1,7 +1,11 @@
 # Import dependencies here
 import os
+import glob
 import re
 #import pandas
+import time
+start_time = time.time()
+
 
 class main:
     def __init__(self):
@@ -13,13 +17,42 @@ class main:
         firstT.cleanup()
 
     def check_file_type(self):
-        for file in os.listdir("."):
-            file_read = os.fsdecode(file)
+        directories = glob.glob('./**/', recursive=True)
+        for item in directories:
+            print(item)
+            for filename2 in os.listdir(item):
+                if (filename2.endswith(".txt") or filename2.endswith(".TXT")):
+                    filename3 = item + "/" + filename2 
+                    first_clean = no_extension_cleanup(filename3)
+                    first_clean.cleanup()
+                    #print(filename2)
+
+        '''
+        for directory in glob.glob('./**/', recursive=True):
+            print(directory)
+            for item in glob.glob(',*.TXT',recursive=True):
+                print(item)
+                #file_read = item
+                #tryF = no_extension_cleanup(file_read)
+                #tryF.cleanup()
+            #for file in os.listdir("."):
+            #file_read = os.fsdecode(file)
             # Find extension type
-            if file_read.endswith(".txt"):
-                file_read = os.fsdecode(file)
+        '''
+        '''
+            if (file_read.endswith(".TXT") or file_read.endswith(".txt")):
                 tryF = no_extension_cleanup(file_read)
                 tryF.cleanup()
+                
+                try:
+                    file_read = os.fsdecode(file)
+                    tryF = no_extension_cleanup(file_read)
+                    tryF.cleanup()
+                except:
+                    break
+                    print("Ooops")
+                    '''
+
                 #print("We got a text file\n")
                 #print(self.file_read)
                 #first = no_extension_cleanup(self.file_read)
@@ -30,7 +63,7 @@ class main:
 class no_extension_cleanup():
     def __init__(self, filetoRead):
         self.filetoRead = filetoRead
-        self.cards_regex_dict = {"Amex":"^3[47][0-9]{13}$",
+        self.pii_values = {"Amex":"^3[47][0-9]{13}$",
     "BCGlobal":"^(6541|6556)[0-9]{12}$",
     "Carte Blanche":"^389[0-9]{11}$",
     "Diners Club":"^3(?:0[0-5]|[68][0-9])[0-9]{11}$",
@@ -45,13 +78,13 @@ class no_extension_cleanup():
     "Switch":"^(4903|4905|4911|4936|6333|6759)[0-9]{12}|(4903|4905|4911|4936|6333|6759)[0-9]{14}|(4903|4905|4911|4936|6333|6759)[0-9]{15}|564182[0-9]{10}|564182[0-9]{12}|564182[0-9]{13}|633110[0-9]{10}|633110[0-9]{12}|633110[0-9]{13}$",
     "Union Pay":"^(62[0-9]{14,17})$",
     "Visa":"^4[0-9]{12}(?:[0-9]{3})?$",
-    "Visa Master":"^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14})$"}
+    "Social Security Number":"^(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}$"}
 
     def cleanup(self):
-        #print("Yo")
+        #print("Yo")clear
         #Searches for social security numbers 
         
-        occurrences = open("exposed_files.txt","w")
+        occurrences = open("exposed_files.txt","a")
 
         with open(self.filetoRead, "r", encoding="utf-8") as file:
             count = 0
@@ -59,14 +92,20 @@ class no_extension_cleanup():
             line = file.readline()
             while line:
                 linecount +=1
-                lineList = line.split(" ")
+                lineList = line.split(",")
                 for section in lineList:
                     section = str(section)
-                    first = re.search("^(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}$",section)
-                    if (first):
-                            occurrences.write(f"File name: {self.filetoRead} \n")
-                            occurrences.write(f"Line Number {linecount} \n")
-                            break                
+                    for key,value in self.pii_values.items():
+                        if (key=="Social Security Number"):
+                            value_search = re.search(str(value),section)
+                        else:
+                            #section_stripped = section.strip("-")
+                            section_stripped = section.strip(",")
+                            section_stripped = section_stripped.strip()
+                            value_search = re.search(str(value), section_stripped)
+
+                        if value_search:
+                            occurrences.write(f"File name: {self.filetoRead}, Line Number: {linecount}, Type: {key} \n")                 
                 line = file.readline()
             
 
@@ -82,4 +121,4 @@ class SQL_database_cleanup():
 
 
 first = main()
-
+print("--- %s seconds ---" % (time.time() - start_time))
