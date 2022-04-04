@@ -13,63 +13,49 @@ class main:
         self.check_file_type()
     
     def execute(self):
-        firstT = no_extension_cleanup()
-        firstT.cleanup()
+        firstT = no_extension_search()
+        firstT.search()
+
+    def convert_bytes(self, num):
+        for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+            if num < 1024.0:
+                return "%3.1f %s" % (num, x)
+            num /= 1024.0
 
     def check_file_type(self):
         counter = 0
+        fileSizeSum = 0
         directories = glob.glob('./**/', recursive=True)
         numFiles = open("filesChecked.txt","w")
         for item in directories:
             print(item)
             for filename2 in os.listdir(item):
+                filename3 = item + filename2 
+                fileSize = self.convert_bytes(os.stat(filename3).st_size)
+                fileSizeSum = fileSizeSum + os.stat(filename3).st_size
+                numFiles.write(f"File checked: {filename3} File size: {fileSize} \n ")
                 if (filename2.endswith(".txt") or filename2.endswith(".TXT")):
                     counter += 1
-                    filename3 = item + filename2 
-                    numFiles.write(f"File checked: {filename3}\n")
-                    first_clean = no_extension_cleanup(filename3)
-                    first_clean.cleanup()
+                    firstCheck = no_extension_search(filename3)
+                    firstCheck.search()
+                if (filename2.endswith("csv")):
+                    pass
+                    #firstCheck = csv_files_search(filename3)
+                    #firstCheck.search()
+
+
         numFiles.write(f"Number of files checked: {str(counter)}\n")
+        numFiles.write(f"Total size: {str(self.convert_bytes(fileSizeSum))}\n")
                     #print(filename2)
 
-        '''
-        for directory in glob.glob('./**/', recursive=True):
-            print(directory)
-            for item in glob.glob(',*.TXT',recursive=True):
-                print(item)
-                #file_read = item
-                #tryF = no_extension_cleanup(file_read)
-                #tryF.cleanup()
-            #for file in os.listdir("."):
-            #file_read = os.fsdecode(file)
-            # Find extension type
-        '''
-        '''
-            if (file_read.endswith(".TXT") or file_read.endswith(".txt")):
-                tryF = no_extension_cleanup(file_read)
-                tryF.cleanup()
-                
-                try:
-                    file_read = os.fsdecode(file)
-                    tryF = no_extension_cleanup(file_read)
-                    tryF.cleanup()
-                except:
-                    break
-                    print("Ooops")
-                    '''
 
-                #print("We got a text file\n")
-                #print(self.file_read)
-                #first = no_extension_cleanup(self.file_read)
-                #first.cleanup(self.file_read)
-    
 
         
-class no_extension_cleanup():
+class no_extension_search():
     def __init__(self, filetoRead):
         self.filetoRead = filetoRead
 
-    def line_cleanup(self, aString):
+    def char_search(self, aString):
         pii_values = {"Amex":"^3[47][0-9]{13}$",
         "BCGlobal":"^(6541|6556)[0-9]{12}$",
         "Carte Blanche":"^389[0-9]{11}$",
@@ -88,52 +74,57 @@ class no_extension_cleanup():
         "Social Security Number":"^(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}$"}
         aStringList = aString.split()
         for section in aStringList:
-            # Check if it's all alpha chars again
-            check1 = str(section).isalpha()
-            length = len(section)
-            if not check1 and (length > 8):
-                # Here is where you check if it matches the parameters
-                for key,value in pii_values.items():
-                    value_search = re.search(str(value),section)
-                    if value_search:
-                        return key, section
-                        #print(key, section)
+            # Here is where you check if it matches the parameters
+            for key,value in pii_values.items():
+                value_search = re.search(str(value),section)
+                if value_search:
+                    return key, section
+                    #print(key, section)
             return 0
 
 
-    def cleanup(self):
-        #print("Yo")clear
-        #Searches for social security numbers 
-        
+    def search(self):
         occurrences = open("exposed_files.txt","a")
-
         with open(self.filetoRead, "r", encoding="utf-8") as file:
-            count = 0
             linecount = 0
             line = file.readline()
             while line:
                 linecount += 1
                 line = line.strip()
-                isalpha = line.isalpha()
-                if not isalpha:
-                    # Check here
-                    check3 = self.line_cleanup(line)
-                    if check3 != 0:
-                        filename = self.filetoRead.split(".//")
-                        occurrences.write(f"File name: {filename} Line Number: {linecount} Value: {check3}\n")
+                #print(line)
+                lineList = line.split()
+                for sect in lineList:
+                    sect = sect.strip(",")
+                    #print(sect)
+                    check_letters = sect.isalpha()
+                    if (not check_letters) and (len(sect) > 8):
+                        check_format = self.char_search(sect)
+                        if check_format != 0:
+                            #count += 1
+                            filename = self.filetoRead.split(".//")
+                            occurrences.write(f"File name: {filename[0]} Line Number: {linecount} Value: {check_format}\n")
+                            occurrences.close()
+                            file.close()
+                            return
+                                                       
                 line = file.readline()
+            file.close()
+        occurrences.close()
+        
                     
                           
     
 
 
-class csv_files_cleanup():
+class csv_files_search():
+    def __init__(self, filetoRead):
+        self.filetoRead = filetoRead
+    
+
+class pdf_file_search():
     pass
 
-class pdf_file_cleanup():
-    pass
-
-class SQL_database_cleanup():
+class SQL_database_search():
     pass
 
 
