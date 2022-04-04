@@ -17,14 +17,19 @@ class main:
         firstT.cleanup()
 
     def check_file_type(self):
+        counter = 0
         directories = glob.glob('./**/', recursive=True)
+        numFiles = open("filesChecked.txt","w")
         for item in directories:
             print(item)
             for filename2 in os.listdir(item):
                 if (filename2.endswith(".txt") or filename2.endswith(".TXT")):
-                    filename3 = item + "/" + filename2 
+                    counter += 1
+                    filename3 = item + filename2 
+                    numFiles.write(f"File checked: {filename3}\n")
                     first_clean = no_extension_cleanup(filename3)
                     first_clean.cleanup()
+        numFiles.write(f"Number of files checked: {str(counter)}\n")
                     #print(filename2)
 
         '''
@@ -85,7 +90,8 @@ class no_extension_cleanup():
         for section in aStringList:
             # Check if it's all alpha chars again
             check1 = str(section).isalpha()
-            if not check1:
+            length = len(section)
+            if not check1 and (length > 8):
                 # Here is where you check if it matches the parameters
                 for key,value in pii_values.items():
                     value_search = re.search(str(value),section)
@@ -113,7 +119,8 @@ class no_extension_cleanup():
                     # Check here
                     check3 = self.line_cleanup(line)
                     if check3 != 0:
-                        occurrences.write(f"File name: {self.filetoRead} Line Number: {linecount} Value: {check3}\n")
+                        filename = self.filetoRead.split(".//")
+                        occurrences.write(f"File name: {filename} Line Number: {linecount} Value: {check3}\n")
                 line = file.readline()
                     
                           
