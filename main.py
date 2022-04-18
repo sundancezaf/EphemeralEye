@@ -22,39 +22,6 @@ class main:
                 return "%3.1f %s" % (num, x)
             num /= 1024.0
 
-    def check_file_type(self):
-        counter = 0
-        fileSizeSum = 0
-        directories = glob.glob('./**/', recursive=True)
-        numFiles = open("filesChecked.txt","w")
-        for item in directories:
-            print(item)
-            for filename2 in os.listdir(item):
-                filename3 = item + filename2 
-                fileSize = self.convert_bytes(os.stat(filename3).st_size)
-                fileSizeSum = fileSizeSum + os.stat(filename3).st_size
-                numFiles.write(f"File checked: {filename3} File size: {fileSize} \n ")
-                if (filename2.endswith(".txt") or filename2.endswith(".TXT")):
-                    counter += 1
-                    firstCheck = no_extension_search(filename3)
-                    firstCheck.search()
-                if (filename2.endswith("csv")):
-                    pass
-                    #firstCheck = csv_files_search(filename3)
-                    #firstCheck.search()
-
-
-        numFiles.write(f"Number of files checked: {str(counter)}\n")
-        numFiles.write(f"Total size: {str(self.convert_bytes(fileSizeSum))}\n")
-                    #print(filename2)
-
-
-
-        
-class no_extension_search():
-    def __init__(self, filetoRead):
-        self.filetoRead = filetoRead
-
     def char_search(self, aString):
         pii_values = {"Amex":"^3[47][0-9]{13}$",
         "BCGlobal":"^(6541|6556)[0-9]{12}$",
@@ -82,6 +49,46 @@ class no_extension_search():
                     #print(key, section)
             return 0
 
+    def check_file_type(self):
+        """Checks for types of file
+        """    
+        
+
+        counter = 0
+        fileSizeSum = 0
+        directories = glob.glob('./**/', recursive=True)
+        numFiles = open("filesChecked.txt","w")
+        for item in directories:
+            print(item)
+            for filename2 in os.listdir(item):
+                filename3 = item + filename2 
+                
+                
+                if (filename2.endswith(".txt") or filename2.endswith(".TXT")):
+                    counter += 1
+                    firstCheck = no_extension_search(filename3)
+                    firstCheck.search()
+                    rawSize = os.stat(filename3).st_size
+                    fileSize = self.convert_bytes(os.stat(filename3).st_size)
+                    fileSizeSum = fileSizeSum + os.stat(filename3).st_size
+                    numFiles.write(f"File checked: {filename3} File size: {fileSize} \n ")
+                    
+                if (filename2.endswith("csv")):
+                    print(f"Filename gone over: {filename2}")
+                    firstCheck = csv_files_search(filename3)
+                    fileSize = self.convert_bytes(os.stat(filename3).st_size)
+                    fileSizeSum = fileSizeSum + os.stat(filename3).st_size
+                    #if int(rawSize) < 10960:
+                    firstCheck.search()
+                    numFiles.write(f"File checked: {filename3} File size: {fileSize} \n ")
+                
+
+        numFiles.write(f"Number of files checked: {str(counter)}\n")
+        numFiles.write(f"Total size: {str(self.convert_bytes(fileSizeSum))}\n")
+        
+class no_extension_search():
+    def __init__(self, filetoRead):
+        self.filetoRead = filetoRead
 
     def search(self):
         occurrences = open("exposed_files.txt","a")
@@ -98,7 +105,7 @@ class no_extension_search():
                     #print(sect)
                     check_letters = sect.isalpha()
                     if (not check_letters) and (len(sect) > 8):
-                        check_format = self.char_search(sect)
+                        check_format = main.char_search(self, sect)
                         if check_format != 0:
                             #count += 1
                             filename = self.filetoRead.split(".//")
@@ -109,16 +116,41 @@ class no_extension_search():
                                                        
                 line = file.readline()
             file.close()
-        occurrences.close()
-        
-                    
-                          
-    
+        occurrences.close()   
 
 
 class csv_files_search():
     def __init__(self, filetoRead):
         self.filetoRead = filetoRead
+
+    def search(self):
+        occurrences = open("exposed_files.txt","a")
+        with open(self.filetoRead, "r", encoding="utf-8") as file:
+            linecount = 0
+            line = file.readline()
+            while line:
+                linecount += 1
+                lineList = [x.strip() for x in line.split(',')]
+                for sect in lineList:
+                    #print(sect)
+                    check_letters = sect.isalpha()
+                    if (not check_letters) and (len(sect) > 7):
+                        check_format = main.char_search(self, sect)
+                        if check_format != 0:
+                            #count += 1
+                            filename = self.filetoRead.split(".//")
+
+                            occurrences.write(f"File name: {filename[0].strip('./')} Line Number: {linecount} Value: {check_format}\n")
+                            occurrences.close()
+                            file.close()
+                            return
+                    if linecount == 70:
+                        return
+                                                       
+                line = file.readline()
+            file.close()
+        occurrences.close()
+    
     
 
 class pdf_file_search():
