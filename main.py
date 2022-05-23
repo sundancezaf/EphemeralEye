@@ -1,28 +1,13 @@
 # Import dependencies here
 import os
 import glob
+import concurrent.futures
 import re
 #import pandas
 import time
 start_time = time.time()
 
-
-class main:
-    def __init__(self):
-        self.file_read = None
-        self.check_file_type()
-    
-    def execute(self):
-        firstT = no_extension_search()
-        firstT.search()
-
-    def convert_bytes(self, num):
-        for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
-            if num < 1024.0:
-                return "%3.1f %s" % (num, x)
-            num /= 1024.0
-
-    def char_search(self, aString):
+def char_search(aString):
         pii_values = {"Amex":"^3[47][0-9]{13}$",
         "BCGlobal":"^(6541|6556)[0-9]{12}$",
         "Carte Blanche":"^389[0-9]{11}$",
@@ -49,109 +34,117 @@ class main:
                     #print(key, section)
             return 0
 
+def txt_search (file_read):
+    occurrences = open("exposed_files.txt","a")
+    files_checked = open("filesChecked.txt","a")
+    with open(file_read, "r", encoding="utf-8") as file:
+        files_checked.write(file_read + "\n")
+        linecount = 0
+        line = file.readline()
+        while line:
+            linecount += 1
+            line = line.strip()
+            #print(line)
+            lineList = line.split()
+            for sect in lineList:
+                sect = sect.strip(",")
+                #print(sect)
+                check_letters = sect.isalpha()
+                if (not check_letters) and (len(sect) > 8):
+                    check_format = char_search(sect)
+                    
+
+                    if check_format != 0:
+                        #count += 1
+                        filename = file_read.split(".//")
+                        occurrences.write(f"File name: {filename[0]} Line Number: {linecount} Value: {check_format}\n")
+                        occurrences.close()
+                        file.close()
+                        return
+                                                    
+            line = file.readline()
+        file.close()
+    occurrences.close() 
+
+
+def csv_search(file_read):
+    occurrences = open("exposed_files.txt","a")
+    files_checked = open("filesChecked.txt","a")
+    with open(file_read, "r", encoding="utf-8") as file:
+        files_checked.write(file_read + "\n")
+        linecount = 0
+        line = file.readline()
+        while line:
+            linecount += 1
+            lineList = [x.strip() for x in line.split(',')]
+            for sect in lineList:
+                #print(sect)
+                check_letters = sect.isalpha()
+                if (not check_letters) and (len(sect) > 7):
+                    #print(sect)
+                    check_format = char_search(sect)
+                    #(check_format)
+                    if check_format != 0:
+                        #count += 1
+                        filename = file_read.split(".//")
+
+                        occurrences.write(f"File name: {filename[0].strip('./')} Line Number: {linecount} Value: {check_format}\n")
+                        occurrences.close()
+                        file.close()
+                        return
+                if linecount == 70:
+                    return
+                                                    
+            line = file.readline()
+        file.close()
+    occurrences.close()
+
+
+class main:
+    def __init__(self):
+        self.file_read = None
+        self.csv_list = []
+        self.txt_list = []
+        self.check_file_type()
+        self.execute()
+            
+
     def check_file_type(self):
         """Checks for types of file
         """    
-        
-
         counter = 0
-        fileSizeSum = 0
+        file_size_sum = 0
         directories = glob.glob('./**/', recursive=True)
-        numFiles = open("filesChecked.txt","w")
+        num_files = open("filesChecked.txt","w")
+
+
         for item in directories:
-            print(item)
+            #print(item)
             for filename2 in os.listdir(item):
                 filename3 = item + filename2 
-                
-                
+
                 if (filename2.endswith(".txt") or filename2.endswith(".TXT")):
-                    counter += 1
-                    firstCheck = no_extension_search(filename3)
-                    firstCheck.search()
-                    rawSize = os.stat(filename3).st_size
-                    fileSize = self.convert_bytes(os.stat(filename3).st_size)
-                    fileSizeSum = fileSizeSum + os.stat(filename3).st_size
-                    numFiles.write(f"File checked: {filename3} File size: {fileSize} \n ")
+                    #print(filename3)
+                    self.txt_list.append(filename3)
                     
                 if (filename2.endswith("csv")):
-                    print(f"Filename gone over: {filename2}")
-                    firstCheck = csv_files_search(filename3)
-                    fileSize = self.convert_bytes(os.stat(filename3).st_size)
-                    fileSizeSum = fileSizeSum + os.stat(filename3).st_size
-                    #if int(rawSize) < 10960:
-                    firstCheck.search()
-                    numFiles.write(f"File checked: {filename3} File size: {fileSize} \n ")
-                
+                    #print(filename3)
+                    self.csv_list.append(filename3)
+        print(self.txt_list)
+        print(self.csv_list)
 
-        numFiles.write(f"Number of files checked: {str(counter)}\n")
-        numFiles.write(f"Total size: {str(self.convert_bytes(fileSizeSum))}\n")
+   
+
+    
+
+    def execute(self):
+
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            executor.map(txt_search, self.txt_list)
         
-class no_extension_search():
-    def __init__(self, filetoRead):
-        self.filetoRead = filetoRead
+        with concurrent.futures.ThreadPoolExecutor() as executor2:
+            executor2.map(csv_search, self.csv_list)
 
-    def search(self):
-        occurrences = open("exposed_files.txt","a")
-        with open(self.filetoRead, "r", encoding="utf-8") as file:
-            linecount = 0
-            line = file.readline()
-            while line:
-                linecount += 1
-                line = line.strip()
-                #print(line)
-                lineList = line.split()
-                for sect in lineList:
-                    sect = sect.strip(",")
-                    #print(sect)
-                    check_letters = sect.isalpha()
-                    if (not check_letters) and (len(sect) > 8):
-                        check_format = main.char_search(self, sect)
-                        if check_format != 0:
-                            #count += 1
-                            filename = self.filetoRead.split(".//")
-                            occurrences.write(f"File name: {filename[0]} Line Number: {linecount} Value: {check_format}\n")
-                            occurrences.close()
-                            file.close()
-                            return
-                                                       
-                line = file.readline()
-            file.close()
-        occurrences.close()   
-
-
-class csv_files_search():
-    def __init__(self, filetoRead):
-        self.filetoRead = filetoRead
-
-    def search(self):
-        occurrences = open("exposed_files.txt","a")
-        with open(self.filetoRead, "r", encoding="utf-8") as file:
-            linecount = 0
-            line = file.readline()
-            while line:
-                linecount += 1
-                lineList = [x.strip() for x in line.split(',')]
-                for sect in lineList:
-                    #print(sect)
-                    check_letters = sect.isalpha()
-                    if (not check_letters) and (len(sect) > 7):
-                        check_format = main.char_search(self, sect)
-                        if check_format != 0:
-                            #count += 1
-                            filename = self.filetoRead.split(".//")
-
-                            occurrences.write(f"File name: {filename[0].strip('./')} Line Number: {linecount} Value: {check_format}\n")
-                            occurrences.close()
-                            file.close()
-                            return
-                    if linecount == 70:
-                        return
-                                                       
-                line = file.readline()
-            file.close()
-        occurrences.close()
-    
-    
 
 class pdf_file_search():
     pass
