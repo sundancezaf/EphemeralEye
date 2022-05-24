@@ -30,8 +30,14 @@ Need to conform to the standards provided in: https://treasury.fo.uiowa.edu/site
 ## Regex Expressions
 These expressions look for Social Security Numbers and Credit Card Numbers
 
-SSN == "^(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}$"
+SSN Regex:
 
+```
+SSN == "^(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}$"
+```
+ Credit Card Numbers Regex: 
+
+```
 Credit s :
     Amex : ^3[47][0-9]{13}$
     BCGlobal: ^(6541|6556)[0-9]{12}$
@@ -49,6 +55,7 @@ Credit s :
     Union Pay : ^(62[0-9]{14,17})$
     Visa : ^4[0-9]{12}(?:[0-9]{3})?$
     Visa Master : ^(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14})$
+```
 
 #### PII Values Dictionary
 The above expressions but turned into a dictionary
@@ -88,6 +95,7 @@ https://dumps.wikimedia.org/
 ## Testing Credit Card Numbers
 Fake Credit Card Numbers
 
+```
 JCB, 3566000020000410, 02/2023, 123
 Visa, 4005550000000019, 04/2023, 111
 Visa, 4503300000000008, 04/2023, 431
@@ -106,9 +114,12 @@ Mastercard, 5425233430109903, 04/2023
 Mastercard, 2222420000001113, 08/2023
 Mastercard, 2223000048410010, 09/2023
 Visa, 4263982640269299, 02/2023, 837
+```
 
 
 ### Single Rows 
+
+```
  3566000020000410
  4005550000000019
  4503300000000008
@@ -127,8 +138,8 @@ Visa, 4263982640269299, 02/2023, 837
  2222420000001113
  2223000048410010
  4263982640269299
-
-  4263-9826-4026-9299
+ 4263-9826-4026-9299
+```
 
 ---------------
 
