@@ -179,3 +179,8 @@ Times: 1.28086
 
 1. How to check for csv files saves as txt files?
 
+
+## PDFs
+1. Read and extract the text
+2. Go line by line through the text
+3. Perform the search

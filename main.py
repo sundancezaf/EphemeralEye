@@ -6,7 +6,7 @@ import re
 import time
 from search import *
 
-start_time = time.time()
+start = time.perf_counter()
 
 
 class Main:
@@ -54,4 +54,5 @@ class Main:
 
 
 first = Main()
-print("--- %s seconds ---" % (time.time() - start_time))
+end = time.perf_counter()
+print("--- %s seconds ---" % (end - start))

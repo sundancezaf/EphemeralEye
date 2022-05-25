@@ -17,3 +17,12 @@ After cloning the repo, the folder testFiles contains small files to test the pr
 This is a testing script to check that the regex expressions are working when given a 
 string. First, it checks that a string contains only digits.
 
+## Dependencies
+These will be fixed once the program is packaged. Until then:
+
+```
+1. pdfminer
+```
+
+
+

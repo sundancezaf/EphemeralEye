@@ -120,15 +120,5 @@ def csv_search(file_read):
     occurrences.close()
 
 
-class PDF:
-    """Contains methods to search for PII in PDFs."""
-
-    def __init__(self) -> None:
-        pass
-
-
-class SQL:
-    """Contains methods to search for PII in SQL Databases."""
-
-    def __init__(self) -> None:
-        pass
+def pdf_search(filename):
+    pass
