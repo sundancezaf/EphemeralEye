@@ -1,4 +1,4 @@
-from PyPDF2 import PdfReader
+from PyPDF2 import PdfFileReader
 import re
 
 
@@ -42,28 +42,46 @@ def char_search(a_string):
 
 
 def extraction(file_read):
-    occurrences = open("exposed_files.txt", "a")
-    files_checked = open("filesChecked.txt", "a")
-    files_checked.write(file_read)
+    # occurrences = open("exposed_files.txt", "a")
+    # files_checked = open("filesChecked.txt", "a")
+    # files_checked.write(file_read)
 
-    reader = PdfReader(file_read)
-    pages = reader.pacges
+    reader = PdfFileReader(file_read)
+    # pages = reader.pages
+    first_p = reader.getPage(0)
+    text = first_p.extract_text()
+    print(text)
+    # print(first_p)
+
+    """
+
     for page in pages:
-        page2 = page.extract_text()
-        page_list = page2.split()
+        page2 = pages.extract_text()
+        page2 = page2.strip()
+        print(page2)
+
+        # page_list = page2.split("\n")
+
+        
         for item in page_list:
+            item2 = item.replace(" ", "")
+            print(item2)
+            
             check_letters = item.isalpha()
             if (not check_letters) and (len(item) > 8):
+                print(item)
                 check_format = char_search(item)
-                if check_format != 0:
-                    filename = file_read.split(".//")
-                    occurrences.write(f"File: {filename[0]} Value: {check_format}\n")
-                    files_checked.close()
-                    occurrences.close()
-                    return
+                ##if check_format != 0:
+                # filename = file_read.split(".//")
+                # occurrences.write(f"File: {filename[0]} Value: {check_format}\n")
+                # files_checked.close()
+                # occurrences.close()
+                # return
+                return
+                """
 
-    files_checked.close()
-    occurrences.close()
+    # files_checked.close()
+    # occurrences.close()
     # print(page2)
     # print(type(page2))
     # for line in page.readlines():
@@ -100,6 +118,6 @@ def text_cleanup(text):
         print(text)
 
 
-extraction("pdf-sample.pdf")
-
+# cleextraction("test3.pdf")
+extraction("test2.pdf")
 # text_cleanup("what 123-422-4333,.;*")
