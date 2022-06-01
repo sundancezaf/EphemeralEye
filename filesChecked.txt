@@ -1,0 +1,10 @@
+filesChecked.txt
+credit_card_data.txt
+testFiles/test1.txt
+testFiles/test2.txt
+testFiles/UT.TXT
+testFiles/test_4.txt
+testFiles/test3.txt
+testFiles/idaho.txt
+testFiles/secondTX.csv
+dataSets/iowa-liquor.csv

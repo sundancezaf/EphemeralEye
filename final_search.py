@@ -9,6 +9,8 @@ from pdfminer.pdfparser import PDFParser
 
 
 class Search:
+    """This class provides methods that search strings for PII based on file type."""
+
     def __init__(self):
         self.occurrences = open("exposed_files.txt", "a")
         self.files_checked = open("filesChecked.txt", "a")
@@ -121,6 +123,14 @@ class Search:
         self.occurrences.close()
 
     def convert_pdf_to_string(self, file_read):
+        """Converts text from a PDF file into a string.
+
+        Args:
+            file_read (FILE): A PDF file
+
+        Returns:
+            str: The text from the PDF as a string
+        """
         output_string = StringIO()
         with open(file_read, "rb") as in_file:
             parser = PDFParser(in_file)
@@ -134,6 +144,11 @@ class Search:
         return output_string.getvalue()
 
     def pdf_search(self, file_read):
+        """Searches for PII in a PDF file.
+
+        Args:
+            file_read (FILE): A PDF file
+        """
         filename = file_read.split(".//")
         occurrences = open("exposed_files.txt", "a")
         text = self.convert_pdf_to_string(file_read)

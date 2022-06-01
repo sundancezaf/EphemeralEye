@@ -11,9 +11,7 @@ start = time.perf_counter()
 
 
 class Main:
-    """This class contains methods to check the file types found in a folder, and a method to execute the
-    search functions above.
-    """
+    """This class contains methods to check the file types found in a folder, and a method to execute search functions based on file type."""
 
     def __init__(self):
         self.file_read = None
@@ -23,18 +21,19 @@ class Main:
         self.check_file_type()
         self.execute()
 
+    def dir_traversal():
+        for root, dirs, files in os.walk("."):
+            print(root)
+            path = root.split(os.sep)
+
     def check_file_type(self):
         """Organizes the files found in a folder based on its type and places the file names in its corresponding list"""
-        counter = 0
-        file_size_sum = 0
-        directories = glob.glob("./**/", recursive=True)
-        num_files = open("filesChecked.txt", "w")
 
-        for item in directories:
-
-            # print(item)
-            for filename2 in os.listdir(item):
-                filename3 = item + filename2
+        # directories = glob.glob("~", recursive=True)
+        for root, dirs, files in os.walk("."):
+            directory = root
+            for filename2 in os.listdir(directory):
+                filename3 = directory + "/" + filename2
 
                 if filename2.endswith(".txt") or filename2.endswith(".TXT"):
                     # print(filename3)
@@ -69,4 +68,8 @@ class Main:
 
 first = Main()
 end = time.perf_counter()
+print("--------------------------------------")
 print("--- %s seconds ---" % (end - start))
+print("\n")
+print("Results can be found in the exposed_files.txt file\n")
+print("--------------------------------------")
