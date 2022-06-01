@@ -1,8 +1,0 @@
-first
-two
-asd
-aqwerawe
-ssn
-asdfasd
-social security number
-123-45-6789

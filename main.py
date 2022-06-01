@@ -18,6 +18,7 @@ class Main:
         self.file_read = None
         self.csv_list = []
         self.txt_list = []
+        self.pdf_list = []
         self.check_file_type()
         self.execute()
 
@@ -40,8 +41,13 @@ class Main:
                 if filename2.endswith("csv"):
                     # print(filename3)
                     self.csv_list.append(filename3)
+
+                if filename2.endswith("pdf"):
+                    # print(filename3)
+                    self.pdf_list.append(filename3)
         print(self.txt_list)
         print(self.csv_list)
+        print(self.pdf_list)
 
     def execute(self):
         """Executes the search, maximizing CPU usage, on the lists provided by init."""
@@ -51,6 +57,9 @@ class Main:
 
         with concurrent.futures.ThreadPoolExecutor() as executor2:
             executor2.map(csv_search, self.csv_list)
+
+        with concurrent.futures.ThreadPoolExecutor() as executor3:
+            executor3.map(pdf_search, self.pdf_list)
 
 
 first = Main()

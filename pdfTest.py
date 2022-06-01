@@ -1,5 +1,12 @@
-from PyPDF2 import PdfFileReader
 import re
+
+from io import StringIO
+from pdfminer.converter import TextConverter
+from pdfminer.layout import LAParams
+from pdfminer.pdfdocument import PDFDocument
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from pdfminer.pdfpage import PDFPage
+from pdfminer.pdfparser import PDFParser
 
 
 def char_search(a_string):
@@ -41,54 +48,6 @@ def char_search(a_string):
         return 0
 
 
-def extraction(file_read):
-    # occurrences = open("exposed_files.txt", "a")
-    # files_checked = open("filesChecked.txt", "a")
-    # files_checked.write(file_read)
-
-    reader = PdfFileReader(file_read)
-    # pages = reader.pages
-    first_p = reader.getPage(0)
-    text = first_p.extract_text()
-    print(text)
-    # print(first_p)
-
-    """
-
-    for page in pages:
-        page2 = pages.extract_text()
-        page2 = page2.strip()
-        print(page2)
-
-        # page_list = page2.split("\n")
-
-        
-        for item in page_list:
-            item2 = item.replace(" ", "")
-            print(item2)
-            
-            check_letters = item.isalpha()
-            if (not check_letters) and (len(item) > 8):
-                print(item)
-                check_format = char_search(item)
-                ##if check_format != 0:
-                # filename = file_read.split(".//")
-                # occurrences.write(f"File: {filename[0]} Value: {check_format}\n")
-                # files_checked.close()
-                # occurrences.close()
-                # return
-                return
-                """
-
-    # files_checked.close()
-    # occurrences.close()
-    # print(page2)
-    # print(type(page2))
-    # for line in page.readlines():
-    # print(line)
-    # print(page.extract_text())
-
-
 def text_cleanup(text):
     text_list = text.split()
     translation = {
@@ -118,6 +77,31 @@ def text_cleanup(text):
         print(text)
 
 
-# cleextraction("test3.pdf")
-extraction("test2.pdf")
-# text_cleanup("what 123-422-4333,.;*")
+def convert_pdf_to_string(file_path):
+    output_string = StringIO()
+    with open(file_path, "rb") as in_file:
+        parser = PDFParser(in_file)
+        doc = PDFDocument(parser)
+        rsrcmgr = PDFResourceManager()
+        device = TextConverter(rsrcmgr, output_string, laparams=LAParams())
+        interpreter = PDFPageInterpreter(rsrcmgr, device)
+        for page in PDFPage.create_pages(doc):
+            interpreter.process_page(page)
+
+    return output_string.getvalue()
+
+
+def pdf_search(file_read):
+    filename = file_read.split(".//")
+    occurrences = open("exposed_files.txt", "a")
+    text = convert_pdf_to_string(file_read)
+    text_list = text.split()
+    for item in text_list:
+        result = char_search(item)
+        if result != 0:
+            occurrences.write(f"File: {filename[0]} Value: {result}\n")
+            occurrences.close()
+            return
+
+
+pdf_search("test2.pdf")

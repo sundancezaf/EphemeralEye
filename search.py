@@ -1,4 +1,11 @@
 import re
+from io import StringIO
+from pdfminer.converter import TextConverter
+from pdfminer.layout import LAParams
+from pdfminer.pdfdocument import PDFDocument
+from pdfminer.pdfinterp import PDFResourceManager, PDFPageInterpreter
+from pdfminer.pdfpage import PDFPage
+from pdfminer.pdfparser import PDFParser
 
 
 def char_search(a_string):
@@ -120,5 +127,28 @@ def csv_search(file_read):
     occurrences.close()
 
 
-def pdf_search(filename):
-    pass
+def convert_pdf_to_string(file_path):
+    output_string = StringIO()
+    with open(file_path, "rb") as in_file:
+        parser = PDFParser(in_file)
+        doc = PDFDocument(parser)
+        rsrcmgr = PDFResourceManager()
+        device = TextConverter(rsrcmgr, output_string, laparams=LAParams())
+        interpreter = PDFPageInterpreter(rsrcmgr, device)
+        for page in PDFPage.create_pages(doc):
+            interpreter.process_page(page)
+
+    return output_string.getvalue()
+
+
+def pdf_search(file_read):
+    filename = file_read.split(".//")
+    occurrences = open("exposed_files.txt", "a")
+    text = convert_pdf_to_string(file_read)
+    text_list = text.split()
+    for item in text_list:
+        result = char_search(item)
+        if result != 0:
+            occurrences.write(f"File: {filename[0]} Value: {result}\n")
+            occurrences.close()
+            return
