@@ -5,6 +5,7 @@ import concurrent.futures
 import re
 import time
 from search import *
+import final_search
 
 start = time.perf_counter()
 
@@ -30,6 +31,7 @@ class Main:
         num_files = open("filesChecked.txt", "w")
 
         for item in directories:
+
             # print(item)
             for filename2 in os.listdir(item):
                 filename3 = item + filename2
@@ -53,13 +55,16 @@ class Main:
         """Executes the search, maximizing CPU usage, on the lists provided by init."""
 
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            executor.map(txt_search, self.txt_list)
+            search_exec = final_search.Search()
+            executor.map(search_exec.txt_search, self.txt_list)
 
         with concurrent.futures.ThreadPoolExecutor() as executor2:
-            executor2.map(csv_search, self.csv_list)
+            search_exec2 = final_search.Search()
+            executor2.map(search_exec2.csv_search, self.csv_list)
 
         with concurrent.futures.ThreadPoolExecutor() as executor3:
-            executor3.map(pdf_search, self.pdf_list)
+            search_exec3 = final_search.Search()
+            executor3.map(search_exec3.pdf_search, self.pdf_list)
 
 
 first = Main()
