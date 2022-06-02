@@ -13,15 +13,11 @@ After cloning the repo, the folder testFiles contains small files to test the pr
 
 ## Included Files
 
-#### digitTest.py
-This is a testing script to check that the regex expressions are working when given a 
-string. First, it checks that a string contains only digits.
-
 ## Dependencies
-These will be fixed once the program is packaged. Until then:
+These will be fixed once the program is packaged. until then, pip install the following:
 
 ```
-1. pdfminer
+1. pdfminer.six
 ```
 
 

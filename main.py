@@ -6,6 +6,7 @@ import final_search
 
 start = time.perf_counter()
 
+
 class Main:
     """This class contains methods to check the file types found in a folder,
     and a method to execute search functions based on file type."""
@@ -39,9 +40,9 @@ class Main:
                 if filename2.endswith("pdf"):
                     # print(filename3)
                     self.pdf_list.append(filename3)
-        #print(self.txt_list)
-        #print(self.csv_list)
-        #print(self.pdf_list)
+        # print(self.txt_list)
+        # print(self.csv_list)
+        # print(self.pdf_list)
 
     def execute(self):
         """Executes the search, maximizing CPU usage, on the lists provided by init."""
@@ -59,7 +60,7 @@ class Main:
             executor3.map(search_exec3.pdf_search, self.pdf_list)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     first = Main()
     end = time.perf_counter()
     print("--------------------------------------")
