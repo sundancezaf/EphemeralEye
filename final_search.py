@@ -12,8 +12,8 @@ class Search:
     """This class provides methods that search strings for PII based on file type."""
 
     def __init__(self):
-        self.occurrences = open("exposed_files.txt", "a")
-        self.files_checked = open("filesChecked.txt", "a")
+        self.occurrences = open("exposed_files.txt", "a", encoding='utf-8')
+        self.files_checked = open("filesChecked.txt", "a", encoding='utf-8')
 
     def char_search(self, a_string):
         """This function checks a string for social security numbers and credit card numbers.
@@ -58,7 +58,7 @@ class Search:
         Args:
             file_read (FILE): A white-space delimited txt file
         """
-        occurrences = open("exposed_files.txt", "a")
+        occurrences = open("exposed_files.txt", "a", encoding='utf-8')
 
         with open(file_read, "r", encoding="utf-8") as file:
             self.files_checked.write(file_read.strip("./") + "\n")
@@ -132,7 +132,7 @@ class Search:
             str: The text from the PDF as a string
         """
         output_string = StringIO()
-        with open(file_read, "rb") as in_file:
+        with open(file_read, "rb", encoding='utf-8') as in_file:
             parser = PDFParser(in_file)
             doc = PDFDocument(parser)
             rsrcmgr = PDFResourceManager()
@@ -150,7 +150,7 @@ class Search:
             file_read (FILE): A PDF file
         """
         filename = file_read.split(".//")
-        occurrences = open("exposed_files.txt", "a")
+        occurrences = open("exposed_files.txt", "a", encoding='utf-8')
         text = self.convert_pdf_to_string(file_read)
         text_list = text.split()
         for item in text_list:

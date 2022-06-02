@@ -1,17 +1,14 @@
 # Import dependencies here
 import os
-import glob
 import concurrent.futures
-import re
 import time
-from search import *
 import final_search
 
 start = time.perf_counter()
 
-
 class Main:
-    """This class contains methods to check the file types found in a folder, and a method to execute search functions based on file type."""
+    """This class contains methods to check the file types found in a folder,
+    and a method to execute search functions based on file type."""
 
     def __init__(self):
         self.file_read = None
@@ -21,13 +18,9 @@ class Main:
         self.check_file_type()
         self.execute()
 
-    def dir_traversal():
-        for root, dirs, files in os.walk("."):
-            print(root)
-            path = root.split(os.sep)
-
     def check_file_type(self):
-        """Organizes the files found in a folder based on its type and places the file names in its corresponding list"""
+        """Organizes the files found in a folder based on its type
+        and places the file names in its corresponding list"""
 
         # directories = glob.glob("~", recursive=True)
         for root, dirs, files in os.walk("."):
@@ -46,9 +39,9 @@ class Main:
                 if filename2.endswith("pdf"):
                     # print(filename3)
                     self.pdf_list.append(filename3)
-        print(self.txt_list)
-        print(self.csv_list)
-        print(self.pdf_list)
+        #print(self.txt_list)
+        #print(self.csv_list)
+        #print(self.pdf_list)
 
     def execute(self):
         """Executes the search, maximizing CPU usage, on the lists provided by init."""
@@ -66,10 +59,11 @@ class Main:
             executor3.map(search_exec3.pdf_search, self.pdf_list)
 
 
-first = Main()
-end = time.perf_counter()
-print("--------------------------------------")
-print("--- %s seconds ---" % (end - start))
-print("\n")
-print("Results can be found in the exposed_files.txt file\n")
-print("--------------------------------------")
+if __name__ == '__main__':
+    first = Main()
+    end = time.perf_counter()
+    print("--------------------------------------")
+    print("--- %s seconds ---" % (end - start))
+    print("\n")
+    print("Results can be found in the exposed_files.txt file\n")
+    print("--------------------------------------")
