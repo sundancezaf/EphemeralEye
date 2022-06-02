@@ -65,25 +65,28 @@ class Search:
             linecount = 0
             line = file.readline()
             while line:
-                linecount += 1
-                line = line.strip()
-                line_list = line.split()
-                for sect in line_list:
-                    sect = sect.strip(",")
-                    check_letters = sect.isalpha()
-                    if (not check_letters) and (len(sect) > 8):
-                        check_format = self.char_search(sect)
+                try:
+                    linecount += 1
+                    line = line.strip()
+                    line_list = line.split()
+                    for sect in line_list:
+                        sect = sect.strip(",")
+                        check_letters = sect.isalpha()
+                        if (not check_letters) and (len(sect) > 8):
+                            check_format = self.char_search(sect)
 
-                        if check_format != 0:
-                            filename = file_read.split(".//")
-                            occurrences.write(
-                                f"File: {filename[0]} Line Number: {linecount} Value: {check_format}\n"
-                            )
-                            occurrences.close()
-                            file.close()
-                            return
+                            if check_format != 0:
+                                filename = file_read.split(".//")
+                                occurrences.write(
+                                    f"File: {filename[0]} Line Number: {linecount} Value: {check_format}\n"
+                                )
+                                occurrences.close()
+                                file.close()
+                                return
+                    line = file.readline()
+                except FileNotFoundError:
+                    print("File not found. Check to see file has not been deleted.\n")
 
-                line = file.readline()
             file.close()
         occurrences.close()
 
@@ -99,26 +102,28 @@ class Search:
             linecount = 0
             line = file.readline()
             while line:
-                linecount += 1
-                line_list = [x.strip() for x in line.split(",")]
-                for sect in line_list:
-                    check_letters = sect.isalpha()
-                    if (not check_letters) and (len(sect) > 7):
-                        check_format = self.char_search(sect)
-                        if check_format != 0:
-                            filename = file_read.split(".//")
-                            filename = filename[0].strip("./")
+                try:
+                    linecount += 1
+                    line_list = [x.strip() for x in line.split(",")]
+                    for sect in line_list:
+                        check_letters = sect.isalpha()
+                        if (not check_letters) and (len(sect) > 7):
+                            check_format = self.char_search(sect)
+                            if check_format != 0:
+                                filename = file_read.split(".//")
+                                filename = filename[0].strip("./")
 
-                            self.occurrences.write(
-                                f"File: {filename} Line Number: {linecount} Value: {check_format}\n"
-                            )
-                            self.occurrences.close()
-                            file.close()
+                                self.occurrences.write(
+                                    f"File: {filename} Line Number: {linecount} Value: {check_format}\n"
+                                )
+                                self.occurrences.close()
+                                file.close()
+                                return
+                        if linecount == 70:
                             return
-                    if linecount == 70:
-                        return
-
-                line = file.readline()
+                    line = file.readline()
+                except FileNotFoundError:
+                    print("File not found. Check to see file has not been deleted.\n")
             file.close()
         self.occurrences.close()
 
