@@ -1,4 +1,5 @@
 import re
+import json
 from io import StringIO
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
@@ -152,7 +153,7 @@ class Search:
         """Searches for PII in a PDF file.
 
         Args:
-            file_read (FILE): A PDF file
+            file_read (PDF FILE): A PDF file
         """
         filename = file_read.split(".//")
         occurrences = open("exposed_files.txt", "a", encoding="utf-8")
@@ -164,3 +165,37 @@ class Search:
                 occurrences.write(f"File: {filename[0]} Value: {result}\n")
                 occurrences.close()
                 return
+
+    def json_search(self, file_read):
+        """Searches for PII in a JSON file.
+
+        Args:
+            file_read (JSON FILE): A JSON file
+        """
+        occurrences = open("exposed_files.txt", "a", encoding="utf-8")
+        filename = file_read.split(".//")
+        with open(file_read) as data_file:
+            data = json.load(data_file)
+            for value in data.values():
+                if isinstance(value, str):
+                    result = self.char_search(value)
+
+                if isinstance(value, int):
+                    new_string = str(value)
+                    result = self.char_search(new_string)
+
+                if isinstance(value, list):
+                    for item in value:
+                        string_to_search = str(item)
+                        result = self.char_search(string_to_search)
+
+                if isinstance(value, dict):
+                    for key, val in value.items():
+                        new_string = str(val)
+                        result = self.char_search(new_string)
+
+                if (result != 0) and (result != None):
+                    occurrences.write(f"File: {filename[0]} Value: {result}\n")
+                    occurrences.close()
+                    return
+        file_read.close()

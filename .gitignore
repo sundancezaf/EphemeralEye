@@ -5,3 +5,6 @@ __pycache__/
 pdf-sample.pdf
 gir
 secondTX.csv
+test1.json
+test-json-search.ipynb
+exposed_files.txt

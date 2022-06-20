@@ -17,6 +17,7 @@ class Main:
         self.csv_list = []
         self.txt_list = []
         self.pdf_list = []
+        self.json_list = []
         self.check_file_type()
         self.execute()
 
@@ -32,7 +33,10 @@ class Main:
             for filename2 in os.listdir(directory):
                 filename3 = directory + "/" + filename2
 
-                if filename2.endswith(".txt") or filename2.endswith(".TXT"):
+                if (filename2.endswith(".txt") or filename2.endswith(".TXT")) and (
+                    (filename2 != "exposed_files.txt")
+                    and (filename2 != "filesChecked.txt")
+                ):
                     # print(filename3)
                     self.txt_list.append(filename3)
 
@@ -43,6 +47,10 @@ class Main:
                 if filename2.endswith("pdf"):
                     # print(filename3)
                     self.pdf_list.append(filename3)
+
+                if filename2.endswith("json"):
+                    self.json_list.append(filename3)
+
         # print(self.txt_list)cd
         # print(self.csv_list)
         # print(self.pdf_list)
@@ -61,6 +69,10 @@ class Main:
         with concurrent.futures.ThreadPoolExecutor() as executor3:
             search_exec3 = final_search.Search()
             executor3.map(search_exec3.pdf_search, self.pdf_list)
+
+        with concurrent.futures.ThreadPoolExecutor() as executor4:
+            search_exec4 = final_search.Search()
+            executor4.map(search_exec4.json_search, self.json_list)
 
 
 if __name__ == "__main__":
