@@ -3,6 +3,7 @@ import os
 import concurrent.futures
 import time
 import final_search
+from pathlib import Path
 
 start = time.perf_counter()
 
@@ -23,8 +24,10 @@ class Main:
         """Organizes the files found in a folder based on its type
         and places the file names in its corresponding list"""
 
+        home = str(Path.home())
+
         # directories = glob.glob("~", recursive=True)
-        for root, dirs, files in os.walk("."):
+        for root, dirs, files in os.walk(home):
             directory = root
             for filename2 in os.listdir(directory):
                 filename3 = directory + "/" + filename2
@@ -40,7 +43,7 @@ class Main:
                 if filename2.endswith("pdf"):
                     # print(filename3)
                     self.pdf_list.append(filename3)
-        # print(self.txt_list)
+        # print(self.txt_list)cd
         # print(self.csv_list)
         # print(self.pdf_list)
 
