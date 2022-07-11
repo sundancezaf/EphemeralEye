@@ -65,7 +65,7 @@ class Search:
             self.files_checked.write(file_read.strip("./") + "\n")
             linecount = 0
             line = file.readline()
-            while line:
+            for line in file:
                 try:
                     linecount += 1
                     line = line.strip()
@@ -84,7 +84,6 @@ class Search:
                                 occurrences.close()
                                 file.close()
                                 return
-                    line = file.readline()
                 except FileNotFoundError:
                     print("File not found. Check to see file has not been deleted.\n")
 
@@ -102,7 +101,7 @@ class Search:
             self.files_checked.write(file_read.strip("./") + "\n")
             linecount = 0
             line = file.readline()
-            while line:
+            for line in file:
                 try:
                     linecount += 1
                     line_list = [x.strip() for x in line.split(",")]
@@ -122,7 +121,6 @@ class Search:
                                 return
                         if linecount == 70:
                             return
-                    line = file.readline()
                 except FileNotFoundError:
                     print("File not found. Check to see file has not been deleted.\n")
             file.close()
