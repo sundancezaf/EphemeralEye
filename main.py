@@ -1,9 +1,11 @@
 # Import dependencies here
 import os
-import concurrent.futures
+import sys
 import time
-import final_search
+import concurrent.futures
 from pathlib import Path
+import final_search
+
 
 start = time.perf_counter()
 
@@ -31,9 +33,10 @@ class Main:
         for root, dirs, files in os.walk(home):
             directory = root
             for filename2 in os.listdir(directory):
+                filename2 = filename2.lower()
                 filename3 = directory + "/" + filename2
 
-                if (filename2.endswith(".txt") or filename2.endswith(".TXT")) and (
+                if (filename2.endswith(".txt")) and (
                     (filename2 != "exposed_files.txt")
                     and (filename2 != "filesChecked.txt")
                 ):
@@ -58,21 +61,36 @@ class Main:
     def execute(self):
         """Executes the search, maximizing CPU usage, on the lists provided by init."""
 
-        with concurrent.futures.ThreadPoolExecutor() as executor:
-            search_exec = final_search.Search()
-            executor.map(search_exec.txt_search, self.txt_list)
+        if len(sys.argv) > 1:
+            start_file = sys.argv[1]
+            self.check_file_type(start_file)
+            for item in self.csv_list:
+                final_search.Search()
+            for item in self.txt_list:
+                final_search.Search()
+            for item in self.csv_list:
+                final_search
+            for item in self.json_list:
+                final_search.Search()
+            for item in self.pdf_list:
+                final_search.Search()
 
-        with concurrent.futures.ThreadPoolExecutor() as executor2:
-            search_exec2 = final_search.Search()
-            executor2.map(search_exec2.csv_search, self.csv_list)
+        else:
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                search_exec = final_search.Search()
+                executor.map(search_exec.txt_search, self.txt_list)
 
-        with concurrent.futures.ThreadPoolExecutor() as executor3:
-            search_exec3 = final_search.Search()
-            executor3.map(search_exec3.pdf_search, self.pdf_list)
+            with concurrent.futures.ThreadPoolExecutor() as executor2:
+                search_exec2 = final_search.Search()
+                executor2.map(search_exec2.csv_search, self.csv_list)
 
-        with concurrent.futures.ThreadPoolExecutor() as executor4:
-            search_exec4 = final_search.Search()
-            executor4.map(search_exec4.json_search, self.json_list)
+            with concurrent.futures.ThreadPoolExecutor() as executor3:
+                search_exec3 = final_search.Search()
+                executor3.map(search_exec3.pdf_search, self.pdf_list)
+
+            with concurrent.futures.ThreadPoolExecutor() as executor4:
+                search_exec4 = final_search.Search()
+                executor4.map(search_exec4.json_search, self.json_list)
 
 
 if __name__ == "__main__":

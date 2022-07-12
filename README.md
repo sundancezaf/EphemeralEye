@@ -19,6 +19,3 @@ These will be fixed once the program is packaged. until then, pip install the fo
 ```
 1. pdfminer.six
 ```
-
-
-

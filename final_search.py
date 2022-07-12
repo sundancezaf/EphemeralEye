@@ -14,7 +14,7 @@ class Search:
 
     def __init__(self):
         self.occurrences = open("exposed_files.txt", "a", encoding="utf-8")
-        self.files_checked = open("filesChecked.txt", "a", encoding="utf-8")
+        self.files_checked = open("checkedFiles.txt", "a", encoding="utf-8")
 
     def char_search(self, a_string):
         """This function checks a string for social security numbers and credit card numbers.
@@ -34,7 +34,6 @@ class Search:
             "Discover": "^65[4-9][0-9]{13}|64[4-9][0-9]{13}|6011[0-9]{12}|(622(?:12[6-9]|1[3-9][0-9]|[2-8][0-9][0-9]|9[01][0-9]|92[0-5])[0-9]{10})$",
             "Insta Payment": "^63[7-9][0-9]{13}$",
             "JCB": "^(?:2131|1800|35\d{3})\d{11}$",
-            "KoreanLocal": "^9[0-9]{15}$",
             "Laser": "^(6304|6706|6709|6771)[0-9]{12,15}$",
             "Maestro": "^(5018|5020|5038|6304|6759|6761|6763)[0-9]{8,15}$",
             "Master": "^(5[1-5][0-9]{14}|2(22[1-9][0-9]{12}|2[3-9][0-9]{13}|[3-6][0-9]{14}|7[0-1][0-9]{13}|720[0-9]{12}))$",
@@ -73,7 +72,7 @@ class Search:
                     for sect in line_list:
                         sect = sect.strip(",")
                         check_letters = sect.isalpha()
-                        if (not check_letters) and (len(sect) > 8):
+                        if (not check_letters) and (len(sect) > 8) and (len(sect) < 17):
                             check_format = self.char_search(sect)
 
                             if check_format != 0:
@@ -107,7 +106,7 @@ class Search:
                     line_list = [x.strip() for x in line.split(",")]
                     for sect in line_list:
                         check_letters = sect.isalpha()
-                        if (not check_letters) and (len(sect) > 7):
+                        if (not check_letters) and (len(sect) > 7) and (len(sect) < 17):
                             check_format = self.char_search(sect)
                             if check_format != 0:
                                 filename = file_read.split(".//")
@@ -158,11 +157,12 @@ class Search:
         text = self.convert_pdf_to_string(file_read)
         text_list = text.split()
         for item in text_list:
-            result = self.char_search(item)
-            if result != 0:
-                occurrences.write(f"File: {filename[0]} Value: {result}\n")
-                occurrences.close()
-                return
+            if (len(item) > 7) and (len(item) < 17):
+                result = self.char_search(item)
+                if result != 0:
+                    occurrences.write(f"File: {filename[0]} Value: {result}\n")
+                    occurrences.close()
+                    return
 
     def json_search(self, file_read):
         """Searches for PII in a JSON file.
@@ -176,21 +176,25 @@ class Search:
             data = json.load(data_file)
             for value in data.values():
                 if isinstance(value, str):
-                    result = self.char_search(value)
+                    if (len(value) > 7) and (len(value) < 17):
+                        result = self.char_search(value)
 
                 if isinstance(value, int):
                     new_string = str(value)
-                    result = self.char_search(new_string)
+                    if (len(new_string) > 7) and (len(new_string) < 17):
+                        result = self.char_search(new_string)
 
                 if isinstance(value, list):
                     for item in value:
                         string_to_search = str(item)
-                        result = self.char_search(string_to_search)
+                        if (len(string_to_search) > 7) and (len(string_to_search) < 17):
+                            result = self.char_search(string_to_search)
 
                 if isinstance(value, dict):
                     for key, val in value.items():
                         new_string = str(val)
-                        result = self.char_search(new_string)
+                        if (len(new_string) > 7) and (len(new_string) < 17):
+                            result = self.char_search(new_string)
 
                 if (result != 0) and (result != None):
                     occurrences.write(f"File: {filename[0]} Value: {result}\n")
