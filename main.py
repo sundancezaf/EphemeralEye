@@ -14,14 +14,26 @@ class Main:
     """This class contains methods to check the file types found in a folder,
     and a method to execute search functions based on file type."""
 
-    def __init__(self):
+    def __init__(self, filename):
         self.file_read = None
         self.csv_list = []
         self.txt_list = []
         self.pdf_list = []
         self.json_list = []
         self.check_file_type()
+        self.filename = filename
         self.execute()
+
+    def check_one_file_and_search(self):
+        new_search = final_search.Search()
+        if self.filename.lower().endswith(".csv"):
+            new_search.csv_search(self.filename)
+        if self.filename.lower().endswith(".txt"):
+            new_search.txt_search(self.filename)
+        if self.filename.lower().endswith(".pdf"):
+            new_search.pdf_search(self.filename)
+        if self.filename.lower().endswith(".json"):
+            new_search.json_search(self.filename)
 
     def check_file_type(self):
         """Organizes the files found in a folder based on its type
@@ -61,20 +73,8 @@ class Main:
     def execute(self):
         """Executes the search, maximizing CPU usage, on the lists provided by init."""
 
-        if len(sys.argv) > 1:
-            start_file = sys.argv[1]
-            self.check_file_type(start_file)
-            for item in self.csv_list:
-                final_search.Search()
-            for item in self.txt_list:
-                final_search.Search()
-            for item in self.csv_list:
-                final_search
-            for item in self.json_list:
-                final_search.Search()
-            for item in self.pdf_list:
-                final_search.Search()
-
+        if self.filename != None:
+            self.check_one_file_and_search()
         else:
             with concurrent.futures.ThreadPoolExecutor() as executor:
                 search_exec = final_search.Search()
@@ -94,10 +94,16 @@ class Main:
 
 
 if __name__ == "__main__":
-    first = Main()
-    end = time.perf_counter()
-    print("--------------------------------------")
-    print("--- %s seconds ---" % (end - start))
-    print("\n")
-    print("Results can be found in the exposed_files.txt file\n")
-    print("--------------------------------------")
+    if len(sys.argv) > 1:
+        filename = sys.argv[1]
+        print(filename)
+        new = Main(filename)
+    else:
+        new = Main(None)
+
+end = time.perf_counter()
+print("--------------------------------------")
+print("Completed in: %.2f seconds " % (end - start))
+print("\n")
+print("Results can be found in the exposed_files.txt file\n")
+print("--------------------------------------")

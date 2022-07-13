@@ -2,6 +2,8 @@ import os
 import sys
 import time
 from pathlib import Path
+import final_search
+import main
 
 # print(Path.home())
 """
@@ -27,8 +29,19 @@ print(list_files(dirToSearch, '.txt'))
 """
 
 
+def check_txt_files(filename):
+    count = 0
+    with open(filename, "r") as file:
+        for line in file:
+            line = line.strip()
+            count += 1
+            if count == 500:
+                print(line)
+
+
 if len(sys.argv) > 1:
     filename = sys.argv[1]
     print(filename)
+    new = main.Main(filename)
 else:
     print("Nothing here")

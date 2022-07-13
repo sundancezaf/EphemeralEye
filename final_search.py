@@ -60,7 +60,7 @@ class Search:
         """
         occurrences = open("exposed_files.txt", "a", encoding="utf-8")
 
-        with open(file_read, "r", encoding="utf-8") as file:
+        with open(file_read, "r") as file:
             self.files_checked.write(file_read.strip("./") + "\n")
             linecount = 0
             line = file.readline()
@@ -96,7 +96,7 @@ class Search:
             file_read (CSV): A comma delimited file.
         """
 
-        with open(file_read, "r", encoding="utf-8") as file:
+        with open(file_read, "r") as file:
             self.files_checked.write(file_read.strip("./") + "\n")
             linecount = 0
             line = file.readline()
