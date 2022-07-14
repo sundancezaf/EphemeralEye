@@ -52,14 +52,24 @@ class Search:
                 if value_search:
                     return key, section
             return 0
-    def line_cleanup(self, line, delim):
-        line_list = [x.strip() for x in line.split(delim)]
-        for section in line_list:
-            check_letters = section.isalpha()
-            if(not check_letters) and (len(section)> 7) and (len(section)< 17):
-                check_pii_value = self.char_search(section)
-                return check_pii_value
 
+    def line_cleanup_and_check(self, the_list, line_number, filename):
+        second_count = 0
+        for section in the_list:
+            check_letters = section.isalpha()
+            second_count += 1
+            if (not check_letters) and (len(section) > 7) and (len(section) < 17):
+                check_pii_value = self.char_search(section)
+                if check_pii_value != 0:
+                    if line_number == 0:
+                        self.occurrences.write(
+                            f"File: {filename} Value:{check_pii_value} Line: {second_count}"
+                        )
+                    else:
+                        self.occurrences.write(
+                            f"File: {filename} Value: {check_pii_value} Line: {line_number}\n"
+                        )
+                    return
 
     def txt_search(self, file_read):
         """Searches for PII in a txt file
@@ -67,8 +77,6 @@ class Search:
         Args:
             file_read (FILE): A white-space delimited txt file
         """
-        occurrences = open("exposed_files.txt", "a", encoding="utf-8")
-
         with open(file_read, "r") as file:
             self.files_checked.write(file_read.strip("./") + "\n")
             linecount = 0
@@ -77,43 +85,19 @@ class Search:
                 try:
                     linecount += 1
                     line_list = [x.strip() for x in line.split()]
-                    for sect in line_list:
-                        sect = sect.strip(",")
-                        check_letters = sect.isalpha()
-                        if (not check_letters) and (len(sect) > 8) and (len(sect) < 17):
-                            check_format = self.char_search(sect)
+                    self.line_cleanup_and_check(line_list, linecount, file_read)
 
-                            if check_format != 0:
-                                filename = file_read.split(".//")
-                                occurrences.write(
-                                    f"File: {filename[0]} Line Number: {linecount} Value: {check_format}\n"
-                                )
-                                occurrences.close()
-                                file.close()
-                                return
                 except FileNotFoundError:
                     print("File not found. Check to see file has not been deleted.\n")
-
-            file.close()
-        occurrences.close()
+        file.close()
+        self.occurrences.close()
 
     def doc_search(self, file_read):
-         occurrences = open("exposed_files.txt", "a", encoding="utf-8")
-         my_text = docx2txt.process(file_read)
-         self.files_checked.write(file_read.strip("./") + "\n")
-         line_list = [x.strip() for x in my_text.split()]
-         for line in line_list:
-            linecount = 0
-            check_letters = line.isalpha()
-            if (not check_letters) and (len(line) > 8) and (len(line) < 17):
-                check_format = self.char_search(line)
-                if check_format != 0:
-                    filename = file_read.split(".//")
-                    occurrences.write(f"File: {filename[0]} Line Number: {linecount} Value: {check_format}\n")
-                    occurrences.close()
-                    return
-            
-         
+        my_text = docx2txt.process(file_read)
+        self.files_checked.write(file_read.strip("./") + "\n")
+        line_list = [x.strip() for x in my_text.split()]
+        self.line_cleanup_and_check(line_list, 0, file_read)
+        self.occurrences.close()
 
     def csv_search(self, file_read):
         """Searches for PII in a CSV file.
@@ -121,7 +105,6 @@ class Search:
         Args:
             file_read (CSV): A comma delimited file.
         """
-
         with open(file_read, "r") as file:
             self.files_checked.write(file_read.strip("./") + "\n")
             linecount = 0
@@ -130,22 +113,7 @@ class Search:
                 try:
                     linecount += 1
                     line_list = [x.strip() for x in line.split(",")]
-                    for sect in line_list:
-                        check_letters = sect.isalpha()
-                        if (not check_letters) and (len(sect) > 7) and (len(sect) < 17):
-                            check_format = self.char_search(sect)
-                            if check_format != 0:
-                                filename = file_read.split(".//")
-                                filename = filename[0].strip("./")
-
-                                self.occurrences.write(
-                                    f"File: {filename} Line Number: {linecount} Value: {check_format}\n"
-                                )
-                                self.occurrences.close()
-                                file.close()
-                                return
-                        if linecount == 70:
-                            return
+                    self.line_cleanup_and_check(line_list, linecount, file_read)
                 except FileNotFoundError:
                     print("File not found. Check to see file has not been deleted.\n")
             file.close()
