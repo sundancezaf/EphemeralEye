@@ -1,7 +1,10 @@
 import re
 import json
+import collections
+import collections.abc
 import docx2txt
-from io import StringIO
+
+from pptx import Presentation
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
 from pdfminer.pdfdocument import PDFDocument
@@ -55,21 +58,22 @@ class Search:
 
     def line_cleanup_and_check(self, the_list, line_number, filename):
         second_count = 0
-        for section in the_list:
-            check_letters = section.isalpha()
-            second_count += 1
-            if (not check_letters) and (len(section) > 7) and (len(section) < 17):
-                check_pii_value = self.char_search(section)
-                if check_pii_value != 0:
-                    if line_number == 0:
-                        self.occurrences.write(
-                            f"File: {filename} Value:{check_pii_value} Line: {second_count}"
-                        )
-                    else:
-                        self.occurrences.write(
-                            f"File: {filename} Value: {check_pii_value} Line: {line_number}\n"
-                        )
-                    return
+        if len(the_list) > 0:
+            for section in the_list:
+                check_letters = section.isalpha()
+                second_count += 1
+                if (not check_letters) and (len(section) > 7) and (len(section) < 17):
+                    check_pii_value = self.char_search(section)
+                    if check_pii_value != 0:
+                        if line_number == 0:
+                            self.occurrences.write(
+                                f"File: {filename} Value:{check_pii_value} Line: {second_count}"
+                            )
+                        else:
+                            self.occurrences.write(
+                                f"File: {filename} Value: {check_pii_value} Line: {line_number}\n"
+                            )
+                        return
 
     def txt_search(self, file_read):
         """Searches for PII in a txt file
@@ -98,6 +102,15 @@ class Search:
         line_list = [x.strip() for x in my_text.split()]
         self.line_cleanup_and_check(line_list, 0, file_read)
         self.occurrences.close()
+
+    def pptx_search(self, file_read):
+        file = Presentation(file_read)
+        for slide in file.slides:
+            for shape in slide.shapes:
+                if hasattr(shape, "text"):
+                    line = shape.text
+                    line_list = line.split()
+                    self.line_cleanup_and_check(line_list, 0, file_read)
 
     def csv_search(self, file_read):
         """Searches for PII in a CSV file.
