@@ -20,6 +20,7 @@ class Main:
         self.txt_list = []
         self.pdf_list = []
         self.json_list = []
+        self.doc_list = []
         self.check_file_type()
         self.filename = filename
         self.execute()
@@ -34,6 +35,8 @@ class Main:
             new_search.pdf_search(self.filename)
         if self.filename.lower().endswith(".json"):
             new_search.json_search(self.filename)
+        if self.filename.lower().endswith(".docx"):
+            new_search.doc_search(self.filename)
 
     def check_file_type(self):
         """Organizes the files found in a folder based on its type
@@ -65,6 +68,9 @@ class Main:
 
                 if filename2.endswith("json"):
                     self.json_list.append(filename3)
+                
+                if filename2.endswith("docx"):
+                    self.doc_list.append(filename3)
 
         # print(self.txt_list)cd
         # print(self.csv_list)

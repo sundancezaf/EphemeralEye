@@ -1,5 +1,6 @@
 import re
 import json
+import docx2txt
 from io import StringIO
 from pdfminer.converter import TextConverter
 from pdfminer.layout import LAParams
@@ -51,6 +52,14 @@ class Search:
                 if value_search:
                     return key, section
             return 0
+    def line_cleanup(self, line, delim):
+        line_list = [x.strip() for x in line.split(delim)]
+        for section in line_list:
+            check_letters = section.isalpha()
+            if(not check_letters) and (len(section)> 7) and (len(section)< 17):
+                check_pii_value = self.char_search(section)
+                return check_pii_value
+
 
     def txt_search(self, file_read):
         """Searches for PII in a txt file
@@ -67,8 +76,7 @@ class Search:
             for line in file:
                 try:
                     linecount += 1
-                    line = line.strip()
-                    line_list = line.split()
+                    line_list = [x.strip() for x in line.split()]
                     for sect in line_list:
                         sect = sect.strip(",")
                         check_letters = sect.isalpha()
@@ -88,6 +96,24 @@ class Search:
 
             file.close()
         occurrences.close()
+
+    def doc_search(self, file_read):
+         occurrences = open("exposed_files.txt", "a", encoding="utf-8")
+         my_text = docx2txt.process(file_read)
+         self.files_checked.write(file_read.strip("./") + "\n")
+         line_list = [x.strip() for x in my_text.split()]
+         for line in line_list:
+            linecount = 0
+            check_letters = line.isalpha()
+            if (not check_letters) and (len(line) > 8) and (len(line) < 17):
+                check_format = self.char_search(line)
+                if check_format != 0:
+                    filename = file_read.split(".//")
+                    occurrences.write(f"File: {filename[0]} Line Number: {linecount} Value: {check_format}\n")
+                    occurrences.close()
+                    return
+            
+         
 
     def csv_search(self, file_read):
         """Searches for PII in a CSV file.
