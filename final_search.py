@@ -17,8 +17,7 @@ class Search:
     """This class provides methods that search strings for PII based on file type."""
 
     def __init__(self):
-        self.occurrences = open("exposed_files.txt", "a", encoding="utf-8")
-        self.files_checked = open("checkedFiles.txt", "a", encoding="utf-8")
+        pass
 
     def char_search(self, a_string):
         """This function checks a string for social security numbers and credit card numbers.
@@ -56,7 +55,20 @@ class Search:
                     return key, section
             return 0
 
-    def line_cleanup_and_check(self, the_list, line_number, filename):
+    def line_cleanup_and_check(self, the_list, line_number, filename, type_check):
+        if type_check == "txt":
+            occurrences = open("exposed_txt.txt", "a")
+        if type_check == "json":
+            occurrences = open("exposed_json.txt", "a")
+        if type_check == "pdf":
+            occurrences = open("exposed_pdf.txt", "a")
+        if type_check == "csv":
+            occurrences = open("exposed_csv.txt", "a")
+        if type_check == "docx":
+            occurrences = open("exposed_docx.txt", "a")
+        if type_check == "pptx":
+            occurrences = open("exposed_pptx.txt", "a")
+
         second_count = 0
         if len(the_list) > 0:
             for section in the_list:
@@ -66,7 +78,7 @@ class Search:
                     check_pii_value = self.char_search(section)
                     if check_pii_value != 0:
                         if line_number == 0:
-                            self.occurrences.write(
+                            occurrences.write(
                                 f"File: {filename} Value:{check_pii_value} Line: {second_count}"
                             )
                         else:
@@ -89,18 +101,20 @@ class Search:
                 try:
                     linecount += 1
                     line_list = [x.strip() for x in line.split()]
-                    self.line_cleanup_and_check(line_list, linecount, file_read)
+                    self.line_cleanup_and_check(line_list, linecount, file_read, "txt")
 
                 except FileNotFoundError:
                     print("File not found. Check to see file has not been deleted.\n")
         file.close()
         self.occurrences.close()
 
+
+'''
     def doc_search(self, file_read):
         my_text = docx2txt.process(file_read)
         self.files_checked.write(file_read.strip("./") + "\n")
         line_list = [x.strip() for x in my_text.split()]
-        self.line_cleanup_and_check(line_list, 0, file_read)
+        self.line_cleanup_and_check(line_list, 0, file_read, "docx")
         self.occurrences.close()
 
     def pptx_search(self, file_read):
@@ -110,7 +124,7 @@ class Search:
                 if hasattr(shape, "text"):
                     line = shape.text
                     line_list = line.split()
-                    self.line_cleanup_and_check(line_list, 0, file_read)
+                    self.line_cleanup_and_check(line_list, 0, file_read, "pptx")
 
     def csv_search(self, file_read):
         """Searches for PII in a CSV file.
@@ -126,7 +140,7 @@ class Search:
                 try:
                     linecount += 1
                     line_list = [x.strip() for x in line.split(",")]
-                    self.line_cleanup_and_check(line_list, linecount, file_read)
+                    self.line_cleanup_and_check(line_list, linecount, file_read, "csv")
                 except FileNotFoundError:
                     print("File not found. Check to see file has not been deleted.\n")
             file.close()
@@ -160,7 +174,7 @@ class Search:
             file_read (PDF FILE): A PDF file
         """
         filename = file_read.split(".//")
-        occurrences = open("exposed_files.txt", "a", encoding="utf-8")
+        occurrences = open("exposed_pdf.txt", "a", encoding="utf-8")
         text = self.convert_pdf_to_string(file_read)
         text_list = text.split()
         for item in text_list:
@@ -177,7 +191,7 @@ class Search:
         Args:
             file_read (JSON FILE): A JSON file
         """
-        occurrences = open("exposed_files.txt", "a", encoding="utf-8")
+        occurrences = open("exposed_json.txt", "a", encoding="utf-8")
         filename = file_read.split(".//")
         with open(file_read) as data_file:
             data = json.load(data_file)
@@ -208,3 +222,5 @@ class Search:
                     occurrences.close()
                     return
         file_read.close()
+
+'''

@@ -57,12 +57,10 @@ class Main:
                     (filename2 != "exposed_files.txt")
                     and (filename2 != "filesChecked.txt")
                 ):
-                    # print(filename3)
                     self.txt_list.append(filename3)
 
-                if filename2.endswith("csv"):
-                    # print(filename3)
-                    self.csv_list.append(filename3)
+                # if filename2.endswith("csv"):
+                # self.csv_list.append(filename3)
 
                 if filename2.endswith("pdf"):
                     # print(filename3)
@@ -77,7 +75,7 @@ class Main:
                 if filename2.endswith("pptx"):
                     self.pptx_list.append(filename3)
 
-        # print(self.txt_list)cd
+        # print(self.txt_list)
         # print(self.csv_list)
         # print(self.pdf_list)
 
@@ -91,6 +89,7 @@ class Main:
                 search_exec = final_search.Search()
                 executor.map(search_exec.txt_search, self.txt_list)
 
+        """
             with concurrent.futures.ThreadPoolExecutor() as executor2:
                 search_exec2 = final_search.Search()
                 executor2.map(search_exec2.csv_search, self.csv_list)
@@ -102,15 +101,21 @@ class Main:
             with concurrent.futures.ThreadPoolExecutor() as executor4:
                 search_exec4 = final_search.Search()
                 executor4.map(search_exec4.json_search, self.json_list)
+        """
 
 
 if __name__ == "__main__":
+    new = Main(None)
+
+    """
     if len(sys.argv) > 1:
         filename = sys.argv[1]
         print(filename)
         new = Main(filename)
     else:
         new = Main(None)
+        # new.execute()
+    """
 
 end = time.perf_counter()
 print("--------------------------------------")
