@@ -82,7 +82,7 @@ class Search:
                                 f"File: {filename} Value:{check_pii_value} Line: {second_count}"
                             )
                         else:
-                            self.occurrences.write(
+                            occurrences.write(
                                 f"File: {filename} Value: {check_pii_value} Line: {line_number}\n"
                             )
                         return
@@ -93,20 +93,63 @@ class Search:
         Args:
             file_read (FILE): A white-space delimited txt file
         """
+
+        txt_file = open("txt_files_checked.txt", "a")
+
         with open(file_read, "r") as file:
-            self.files_checked.write(file_read.strip("./") + "\n")
+            txt_file.write(file_read.strip("./") + "\n")
             linecount = 0
             line = file.readline()
             for line in file:
-                try:
-                    linecount += 1
-                    line_list = [x.strip() for x in line.split()]
-                    self.line_cleanup_and_check(line_list, linecount, file_read, "txt")
+                linecount += 1
+                line_list = [x.strip() for x in line.split()]
+                self.line_cleanup_and_check(line_list, linecount, file_read, "txt")
 
-                except FileNotFoundError:
-                    print("File not found. Check to see file has not been deleted.\n")
+                # except FileNotFoundError:
+                # print("File not found. Check to see file has not been deleted.\n")
         file.close()
-        self.occurrences.close()
+
+    def csv_search(self, file_read):
+        """Searches for PII in a CSV file.
+
+        Args:
+            file_read (CSV): A comma delimited file.
+        """
+
+        csv_file = open("csv_files_checked.txt", "a")
+
+        with open(file_read, "r") as file:
+            csv_file.write(file_read.strip("./") + "\n")
+            linecount = 0
+            line = file.readline()
+            for line in file:
+                linecount += 1
+                line_list = [x.strip() for x in line.split(",")]
+                self.line_cleanup_and_check(line_list, linecount, file_read, "csv")
+
+        file.close()
+
+    def pdf_search(self, file_read):
+        """Searches for PII in a PDF file.
+
+        Args:
+            file_read (PDF FILE): A PDF file
+        """
+
+        pdf_file = open("pdf_files_checked.txt", "a")
+
+        filename = file_read.split(".//")
+        pdf_file.write(filename)
+        occurrences = open("exposed_pdf.txt", "a", encoding="utf-8")
+        text = self.convert_pdf_to_string(file_read)
+        text_list = text.split()
+        for item in text_list:
+            if (len(item) > 7) and (len(item) < 17):
+                result = self.char_search(item)
+                if result != 0:
+                    occurrences.write(f"File: {filename[0]} Value: {result}\n")
+                    occurrences.close()
+                    return
 
 
 '''
@@ -126,25 +169,7 @@ class Search:
                     line_list = line.split()
                     self.line_cleanup_and_check(line_list, 0, file_read, "pptx")
 
-    def csv_search(self, file_read):
-        """Searches for PII in a CSV file.
-
-        Args:
-            file_read (CSV): A comma delimited file.
-        """
-        with open(file_read, "r") as file:
-            self.files_checked.write(file_read.strip("./") + "\n")
-            linecount = 0
-            line = file.readline()
-            for line in file:
-                try:
-                    linecount += 1
-                    line_list = [x.strip() for x in line.split(",")]
-                    self.line_cleanup_and_check(line_list, linecount, file_read, "csv")
-                except FileNotFoundError:
-                    print("File not found. Check to see file has not been deleted.\n")
-            file.close()
-        self.occurrences.close()
+    
 
     def convert_pdf_to_string(self, file_read):
         """Converts text from a PDF file into a string.
@@ -167,23 +192,7 @@ class Search:
 
         return output_string.getvalue()
 
-    def pdf_search(self, file_read):
-        """Searches for PII in a PDF file.
-
-        Args:
-            file_read (PDF FILE): A PDF file
-        """
-        filename = file_read.split(".//")
-        occurrences = open("exposed_pdf.txt", "a", encoding="utf-8")
-        text = self.convert_pdf_to_string(file_read)
-        text_list = text.split()
-        for item in text_list:
-            if (len(item) > 7) and (len(item) < 17):
-                result = self.char_search(item)
-                if result != 0:
-                    occurrences.write(f"File: {filename[0]} Value: {result}\n")
-                    occurrences.close()
-                    return
+    
 
     def json_search(self, file_read):
         """Searches for PII in a JSON file.

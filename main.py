@@ -53,14 +53,11 @@ class Main:
                 filename2 = filename2.lower()
                 filename3 = directory + "/" + filename2
 
-                if (filename2.endswith(".txt")) and (
-                    (filename2 != "exposed_files.txt")
-                    and (filename2 != "filesChecked.txt")
-                ):
+                if filename2.endswith(".txt"):
                     self.txt_list.append(filename3)
 
-                # if filename2.endswith("csv"):
-                # self.csv_list.append(filename3)
+                if filename2.endswith("csv"):
+                    self.csv_list.append(filename3)
 
                 if filename2.endswith("pdf"):
                     # print(filename3)
@@ -75,10 +72,6 @@ class Main:
                 if filename2.endswith("pptx"):
                     self.pptx_list.append(filename3)
 
-        # print(self.txt_list)
-        # print(self.csv_list)
-        # print(self.pdf_list)
-
     def execute(self):
         """Executes the search, maximizing CPU usage, on the lists provided by init."""
 
@@ -89,11 +82,10 @@ class Main:
                 search_exec = final_search.Search()
                 executor.map(search_exec.txt_search, self.txt_list)
 
-        """
             with concurrent.futures.ThreadPoolExecutor() as executor2:
                 search_exec2 = final_search.Search()
                 executor2.map(search_exec2.csv_search, self.csv_list)
-
+        """
             with concurrent.futures.ThreadPoolExecutor() as executor3:
                 search_exec3 = final_search.Search()
                 executor3.map(search_exec3.pdf_search, self.pdf_list)
@@ -105,21 +97,18 @@ class Main:
 
 
 if __name__ == "__main__":
-    new = Main(None)
 
-    """
     if len(sys.argv) > 1:
         filename = sys.argv[1]
-        print(filename)
+        # print(filename)
         new = Main(filename)
     else:
         new = Main(None)
         # new.execute()
-    """
+
 
 end = time.perf_counter()
 print("--------------------------------------")
 print("Completed in: %.2f seconds " % (end - start))
 print("\n")
-print("Results can be found in the exposed_files.txt file\n")
 print("--------------------------------------")
