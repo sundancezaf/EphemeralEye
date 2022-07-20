@@ -15,6 +15,7 @@ class Main:
 
     def __init__(self, filename):
         self.file_read = None
+        self.filename = filename
         self.csv_list = []
         self.txt_list = []
         self.pdf_list = []
@@ -22,10 +23,12 @@ class Main:
         self.doc_list = []
         self.pptx_list = []
         self.check_file_type()
-        self.filename = filename
         self.execute()
 
     def check_one_file_and_search(self):
+        """When a new instance is created and one single file needs to be checked,
+        this function checks what file type it is and then triggers the search for it.
+        """
         new_search = final_search.Search()
         if self.filename.lower().endswith(".csv"):
             new_search.csv_search(self.filename)
@@ -39,6 +42,8 @@ class Main:
             new_search.doc_search(self.filename)
         if self.filename.lower().endswith(".pptx"):
             new_search.pptx_search(self.filename)
+        else:
+            print("File format not supported\n")
 
     def check_file_type(self):
         """Organizes the files found in a folder based on its type
