@@ -32,18 +32,18 @@ class Main:
         new_search = final_search.Search()
         if self.filename.lower().endswith(".csv"):
             new_search.csv_search(self.filename)
-        if self.filename.lower().endswith(".txt"):
+        elif self.filename.lower().endswith(".txt"):
             new_search.txt_search(self.filename)
-        if self.filename.lower().endswith(".pdf"):
+        elif self.filename.lower().endswith(".pdf"):
             new_search.pdf_search(self.filename)
-        if self.filename.lower().endswith(".json"):
+        elif self.filename.lower().endswith(".json"):
             new_search.json_search(self.filename)
-        if self.filename.lower().endswith(".docx"):
+        elif self.filename.lower().endswith(".docx"):
             new_search.doc_search(self.filename)
-        if self.filename.lower().endswith(".pptx"):
+        elif self.filename.lower().endswith(".pptx"):
             new_search.pptx_search(self.filename)
         else:
-            print("File format not supported\n")
+            print("File format not supported. Please add support for this file.\n")
 
     def check_file_type(self):
         """Organizes the files found in a folder based on its type
@@ -90,7 +90,7 @@ class Main:
             with concurrent.futures.ThreadPoolExecutor() as executor2:
                 search_exec2 = final_search.Search()
                 executor2.map(search_exec2.csv_search, self.csv_list)
-        """
+
             with concurrent.futures.ThreadPoolExecutor() as executor3:
                 search_exec3 = final_search.Search()
                 executor3.map(search_exec3.pdf_search, self.pdf_list)
@@ -98,18 +98,15 @@ class Main:
             with concurrent.futures.ThreadPoolExecutor() as executor4:
                 search_exec4 = final_search.Search()
                 executor4.map(search_exec4.json_search, self.json_list)
-        """
 
 
 if __name__ == "__main__":
 
     if len(sys.argv) > 1:
         filename = sys.argv[1]
-        # print(filename)
         new = Main(filename)
     else:
         new = Main(None)
-        # new.execute()
 
 
 end = time.perf_counter()

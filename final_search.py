@@ -3,6 +3,7 @@ import json
 import collections
 import collections.abc
 import docx2txt
+from io import StringIO
 
 from pptx import Presentation
 from pdfminer.converter import TextConverter
@@ -53,7 +54,7 @@ class Search:
                 value_search = re.search(str(value), section)
                 if value_search:
                     return key, section
-            return 0
+        return 0
 
     def line_cleanup_and_check(self, the_list, line_number, filename, type_check):
         if type_check == "txt":
@@ -79,13 +80,15 @@ class Search:
                     if check_pii_value != 0:
                         if line_number == 0:
                             occurrences.write(
-                                f"File: {filename} Value:{check_pii_value} Line: {second_count}"
+                                f"File: {filename} Value:{check_pii_value} Line: {second_count}\n"
                             )
                         else:
                             occurrences.write(
                                 f"File: {filename} Value: {check_pii_value} Line: {line_number}\n"
                             )
+                        occurrences.close()
                         return
+        return
 
     def txt_search(self, file_read):
         """Searches for PII in a txt file
@@ -95,9 +98,9 @@ class Search:
         """
 
         txt_file = open("txt_files_checked.txt", "a")
+        txt_file.write(file_read.strip("./") + "\n")
 
         with open(file_read, "r") as file:
-            txt_file.write(file_read.strip("./") + "\n")
             linecount = 0
             line = file.readline()
             for line in file:
@@ -105,9 +108,8 @@ class Search:
                 line_list = [x.strip() for x in line.split()]
                 self.line_cleanup_and_check(line_list, linecount, file_read, "txt")
 
-                # except FileNotFoundError:
-                # print("File not found. Check to see file has not been deleted.\n")
         file.close()
+        txt_file.close()
 
     def csv_search(self, file_read):
         """Searches for PII in a CSV file.
@@ -115,7 +117,6 @@ class Search:
         Args:
             file_read (CSV): A comma delimited file.
         """
-
         csv_file = open("csv_files_checked.txt", "a")
 
         with open(file_read, "r") as file:
@@ -126,50 +127,8 @@ class Search:
                 linecount += 1
                 line_list = [x.strip() for x in line.split(",")]
                 self.line_cleanup_and_check(line_list, linecount, file_read, "csv")
-
+        csv_file.close()
         file.close()
-
-    def pdf_search(self, file_read):
-        """Searches for PII in a PDF file.
-
-        Args:
-            file_read (PDF FILE): A PDF file
-        """
-
-        pdf_file = open("pdf_files_checked.txt", "a")
-
-        filename = file_read.split(".//")
-        pdf_file.write(filename)
-        occurrences = open("exposed_pdf.txt", "a", encoding="utf-8")
-        text = self.convert_pdf_to_string(file_read)
-        text_list = text.split()
-        for item in text_list:
-            if (len(item) > 7) and (len(item) < 17):
-                result = self.char_search(item)
-                if result != 0:
-                    occurrences.write(f"File: {filename[0]} Value: {result}\n")
-                    occurrences.close()
-                    return
-
-
-'''
-    def doc_search(self, file_read):
-        my_text = docx2txt.process(file_read)
-        self.files_checked.write(file_read.strip("./") + "\n")
-        line_list = [x.strip() for x in my_text.split()]
-        self.line_cleanup_and_check(line_list, 0, file_read, "docx")
-        self.occurrences.close()
-
-    def pptx_search(self, file_read):
-        file = Presentation(file_read)
-        for slide in file.slides:
-            for shape in slide.shapes:
-                if hasattr(shape, "text"):
-                    line = shape.text
-                    line_list = line.split()
-                    self.line_cleanup_and_check(line_list, 0, file_read, "pptx")
-
-    
 
     def convert_pdf_to_string(self, file_read):
         """Converts text from a PDF file into a string.
@@ -181,7 +140,8 @@ class Search:
             str: The text from the PDF as a string
         """
         output_string = StringIO()
-        with open(file_read, "rb", encoding="utf-8") as in_file:
+
+        with open(file_read, "rb") as in_file:
             parser = PDFParser(in_file)
             doc = PDFDocument(parser)
             rsrcmgr = PDFResourceManager()
@@ -189,10 +149,40 @@ class Search:
             interpreter = PDFPageInterpreter(rsrcmgr, device)
             for page in PDFPage.create_pages(doc):
                 interpreter.process_page(page)
-
+        in_file.close()
         return output_string.getvalue()
 
-    
+    def pdf_search(self, file_read):
+        """Searches for PII in a PDF file.
+
+        Args:
+            file_read (PDF FILE): A PDF file
+        """
+        pdf_file = open("pdf_files_checked.txt", "a")
+        filename = file_read.split(".//")
+        pdf_file.write(filename[0] + "\n")
+        text = self.convert_pdf_to_string(file_read)
+        text_list = text.split()
+        self.line_cleanup_and_check(text_list, 0, filename, "pdf")
+        pdf_file.close()
+
+    def doc_search(self, file_read):
+        my_text = docx2txt.process(file_read)
+        docx_file = open("docx_files_checked.txt", "a")
+        docx_file.write(file_read.strip("./") + "\n")
+        line_list = [x.strip() for x in my_text.split()]
+        self.line_cleanup_and_check(line_list, 0, file_read, "docx")
+        docx_file.close()
+
+    def pptx_search(self, file_read):
+        file = Presentation(file_read)
+        for slide in file.slides:
+            for shape in slide.shapes:
+                if hasattr(shape, "text"):
+                    line = shape.text
+                    line_list = line.split()
+                    self.line_cleanup_and_check(line_list, 0, file_read, "pptx")
+        file.close()
 
     def json_search(self, file_read):
         """Searches for PII in a JSON file.
@@ -200,10 +190,12 @@ class Search:
         Args:
             file_read (JSON FILE): A JSON file
         """
+        result = None
         occurrences = open("exposed_json.txt", "a", encoding="utf-8")
         filename = file_read.split(".//")
         with open(file_read) as data_file:
             data = json.load(data_file)
+
             for value in data.values():
                 if isinstance(value, str):
                     if (len(value) > 7) and (len(value) < 17):
@@ -230,6 +222,5 @@ class Search:
                     occurrences.write(f"File: {filename[0]} Value: {result}\n")
                     occurrences.close()
                     return
-        file_read.close()
-
-'''
+        data_file.close()
+        occurrences.close()

@@ -147,7 +147,7 @@ Visa, 4263982640269299, 02/2023, 837
 Filename | Line Number
 ---- | ----
 test2.txt | 8 
-test2.txt | 9 # From here on out, the document will not be checked because it returned one positive resul so entire document needs to be reviewed
+test2.txt | 9 # From here on out, the document will not be checked because it returned one positive result so entire document needs to be reviewed
 test2.txt | 10 # does not appear
 test1. txt | 8 
 idaho.txt | 37388
