@@ -83,18 +83,24 @@ Using concurrent.futures.ProcessPoolExecutor() instead of ThreadPoolExecutor() u
 ### The Corrupted Files
 Filename | Line Number | Type
 ---- | ----
-test2.txt | 8 |
-test2.txt | 9 | Credit Card
-test2.txt | - | MRN
-test2.txt | 10 |
-test1. txt | 8 | SSN
-idaho.txt | 37388 |
-test3.txt | 770 | SSN
-txt-test-5 | - | MRN
-test_4.txt | 12 | Credit Card
-ut.csv | 433 |
+txt_test_2| 8 |
+txt_test_2 | 9 | Credit Card
+txt_test_2 | - | MRN
+txt_test_2| 10 |
+txt_test_1 | 8 | SSN
+txt_idaho_names| 37388 |
+txt_test_3 | 770 | SSN
+txt-test-5 | 844| MRN
+txt_test_4 | 12 | Credit Card
+
+
+csv_ut_test.csv | 433 |
 json_test_1 | - | SSN
-ppt_test_1 | - | SSN
+ppt_test_1| - | SSN
+word_test_1 | - | -
+word_test_2 | - | -
+ppt_test_1 | - | - 
+
 
 ### Credit Cards 
 Some fake numbers to test: 
