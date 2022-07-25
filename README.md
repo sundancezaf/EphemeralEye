@@ -1,7 +1,6 @@
 # Ephemeral Eye
 
-This program searches entire directories for files that contain PII including social security numbers, credit card numbers, routing and account numbers, and insurance numbers.
-It can also perform the PII check on a single file.
+This program searches entire directories for files that contain PII including social security numbers, credit card numbers, routing numbers, and medical record numbers. It can also perform the PII check on a single file. 
 
 ## How to Run
 
