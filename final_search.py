@@ -45,7 +45,11 @@ class Search:
             "Switch": "^(4903|4905|4911|4936|6333|6759)[0-9]{12}|(4903|4905|4911|4936|6333|6759)[0-9]{14}|(4903|4905|4911|4936|6333|6759)[0-9]{15}|564182[0-9]{10}|564182[0-9]{12}|564182[0-9]{13}|633110[0-9]{10}|633110[0-9]{12}|633110[0-9]{13}$",
             "Union Pay": "^(62[0-9]{14,17})$",
             "Visa": "^4[0-9]{12}(?:[0-9]{3})?$",
+            "Bank Routing Number": "\b((0[0-9])|(1[0-2])|(2[1-9])|(3[0-2])|(6[1-9])|(7[0-2])|80)([0-9]{7})\b",
+            "Swift Code": "\b[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?\b",
             "Social Security Number": "^(?!000|666)[0-8][0-9]{2}-(?!00)[0-9]{2}-(?!0000)[0-9]{4}$",
+            "ITIN": "^9\d{2}-?((5[0-9]|6[0-5])|(8[3-8])|(9[0-2])|(9[4-9]))-?\d{4}$",
+            "MRN Type 1": "[1-9]{3}-[1-9]{1}-[1-9]{5}",
         }
         a_string_list = a_string.split()
         for section in a_string_list:
@@ -97,8 +101,10 @@ class Search:
             file_read (FILE): A white-space delimited txt file
         """
 
-        txt_file = open("txt_files_checked.txt", "a")
-        txt_file.write(file_read.strip("./") + "\n")
+        # Uncomment following lines if you want to see what files
+        # were checked
+        # txt_file = open("txt_files_checked.txt", "a")
+        # txt_file.write(file_read.strip("./") + "\n")
 
         with open(file_read, "r") as file:
             linecount = 0
@@ -109,7 +115,7 @@ class Search:
                 self.line_cleanup_and_check(line_list, linecount, file_read, "txt")
 
         file.close()
-        txt_file.close()
+        # txt_file.close()
 
     def csv_search(self, file_read):
         """Searches for PII in a CSV file.
@@ -117,18 +123,22 @@ class Search:
         Args:
             file_read (CSV): A comma delimited file.
         """
-        csv_file = open("csv_files_checked.txt", "a")
+        # Uncomment following lines if you want to see what files
+        # were checked
+        # csv_file = open("csv_files_checked.txt", "a")
+        # csv_file.write(file_read.strip("./") + "\n")
 
         with open(file_read, "r") as file:
-            csv_file.write(file_read.strip("./") + "\n")
+
             linecount = 0
             line = file.readline()
             for line in file:
                 linecount += 1
                 line_list = [x.strip() for x in line.split(",")]
                 self.line_cleanup_and_check(line_list, linecount, file_read, "csv")
-        csv_file.close()
+
         file.close()
+        # csv_file.close()
 
     def convert_pdf_to_string(self, file_read):
         """Converts text from a PDF file into a string.
@@ -158,21 +168,31 @@ class Search:
         Args:
             file_read (PDF FILE): A PDF file
         """
-        pdf_file = open("pdf_files_checked.txt", "a")
+        # uncomment following lines if you want to see what files were checked
+        # don't forget to close file
+
+        # pdf_file = open("pdf_files_checked.txt", "a")
+        # pdf_file.write(filename[0] + "\n")
+
         filename = file_read.split(".//")
-        pdf_file.write(filename[0] + "\n")
         text = self.convert_pdf_to_string(file_read)
         text_list = text.split()
         self.line_cleanup_and_check(text_list, 0, filename, "pdf")
-        pdf_file.close()
 
-    def doc_search(self, file_read):
+        # pdf_file.close()
+
+    def docx_search(self, file_read):
         my_text = docx2txt.process(file_read)
-        docx_file = open("docx_files_checked.txt", "a")
-        docx_file.write(file_read.strip("./") + "\n")
+        # uncomment following lines if you want to see what files were checked
+        # don't forget to close file
+
+        # docx_file = open("docx_files_checked.txt", "a")
+        # docx_file.write(file_read.strip("./") + "\n")
+
         line_list = [x.strip() for x in my_text.split()]
         self.line_cleanup_and_check(line_list, 0, file_read, "docx")
-        docx_file.close()
+
+        # docx_file.close()
 
     def pptx_search(self, file_read):
         file = Presentation(file_read)
