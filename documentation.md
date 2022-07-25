@@ -1,3 +1,15 @@
+# EphemeralEye
+This program searches entire directories for files that contain PII. It can also perform the PII check on a single file. 
+
+Files need to conform to the standards provided in: https://treasury.fo.uiowa.edu/sites/treasury.fo.uiowa.edu/files/wysiwyg_uploads/ui_merchant_services-credit__policy_and_security_standards.pdf
+
+### Information Searched
+- Social Security Numbers
+- Credit Card Numbers
+- Routing Numbers
+- Medical Record Numbers
+- ITIN numbers
+
 ## Class Main
 ### Objects
 ### __init__(filename)
@@ -65,3 +77,39 @@ Searches for PII in a JSON file.
 ### Miscellaneous
 Using concurrent.futures.ProcessPoolExecutor() instead of ThreadPoolExecutor() utilizes more of the CPU but for shorter periods of time.
 
+
+## Testing
+
+### The Corrupted Files
+Filename | Line Number
+---- | ----
+test2.txt | 8 
+test2.txt | 9
+test2.txt | 10 
+test1. txt | 8 
+idaho.txt | 37388
+test3.txt | 770
+test_4.txt | 12
+ut.csv | 433
+
+### Credit Cards 
+Some fake numbers to test: 
+
+JCB, 3566000020000410, 02/2023, 123
+Visa, 4005550000000019, 04/2023, 111
+Visa, 4503300000000008, 04/2023, 431
+Visa, 4205260000000005, 05/2023, 213
+Visa, 4001270000000000, 05/2023, 222
+Visa, 4012000033330026, 05/2023, 566
+Visa, 4005562233445564, 03/2023, 212
+Visa, 4311780000241409, 03/2023, 434
+Visa, 4012000033330026, 02/2023, 121
+Visa, 4311780000241417, 01/2023, 733
+Discover, 6011000990099818, 12/2023, 333
+Amex, 378282246310005, 05/2023
+Discover, 6011000991300009, 12/2023
+JCB, 3530111333300000, 03/2023
+Mastercard, 5425233430109903, 04/2023
+Mastercard, 2222420000001113, 08/2023
+Mastercard, 2223000048410010, 09/2023
+Visa, 4263982640269299, 02/2023, 837
